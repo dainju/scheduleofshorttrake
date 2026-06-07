@@ -288,297 +288,293 @@ header h1{
     </div>
 
 </div>
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
 
-<title>쇼트트랙 대회 일정</title>
+const CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTRV-lLroEFMXiMaricD-GkYcWOyt8cwT6Z6f49GlqbJVwXMQdJllhzPc_gg8io9x6B-z0o_tk3Xbdl/pub?output=csv";
 
-<style>
+let competitions = [];
 
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+
+function parseDate(str){
+
+    if(!str) return null;
+
+    const parts = str.trim().split(".");
+
+    return new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        Number(parts[2])
+    );
 }
 
-body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    background:#f4f6f8;
-    color:#222;
-}
+function formatDateRange(start,end){
 
-header{
-    background:#003366;
-    color:white;
-    text-align:center;
-    padding:20px;
-    position:sticky;
-    top:0;
-    z-index:100;
-}
+    if(!start) return "";
 
-header h1{
-    font-size:24px;
-}
-
-.search-wrap{
-    max-width:1000px;
-    margin:20px auto;
-    padding:0 15px;
-}
-
-#searchInput{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    font-size:16px;
-}
-
-.tabs{
-    max-width:1000px;
-    margin:auto;
-    padding:0 15px;
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
-}
-
-.tab-btn{
-    flex:1;
-    border:none;
-    padding:14px;
-    border-radius:10px;
-    background:white;
-    cursor:pointer;
-    font-weight:600;
-}
-
-.tab-btn.active{
-    background:#003366;
-    color:white;
-}
-
-.container{
-    max-width:1000px;
-    margin:auto;
-    padding:0 15px 30px;
-}
-
-.tab-content{
-    display:none;
-}
-
-.tab-content.active{
-    display:block;
-}
-
-.card{
-    background:white;
-    border-radius:14px;
-    margin-bottom:12px;
-    overflow:hidden;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.summary{
-    padding:15px;
-    cursor:pointer;
-}
-
-.summary:hover{
-    background:#fafafa;
-}
-
-.date{
-    color:#666;
-    font-size:14px;
-}
-
-.title{
-    font-size:18px;
-    font-weight:700;
-    margin:8px 0;
-}
-
-.place{
-    color:#0066cc;
-}
-
-.badge{
-    display:inline-block;
-    padding:4px 8px;
-    border-radius:999px;
-    font-size:12px;
-    margin-top:8px;
-}
-
-.badge.live{
-    background:#d4f8d4;
-}
-
-.badge.upcoming{
-    background:#dbeafe;
-}
-
-.badge.finished{
-    background:#e5e7eb;
-}
-
-.detail{
-    display:none;
-    border-top:1px solid #eee;
-    background:#fafafa;
-    padding:15px;
-}
-
-.card.open .detail{
-    display:block;
-}
-
-.detail p{
-    margin-bottom:8px;
-}
-
-.calendar-nav{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:15px;
-}
-
-.calendar-nav button{
-    border:none;
-    background:#003366;
-    color:white;
-    padding:10px 15px;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-.calendar-title{
-    font-weight:bold;
-    font-size:18px;
-}
-
-.calendar{
-    background:white;
-    border-radius:14px;
-    overflow:hidden;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.calendar-grid{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-}
-
-.day-header{
-    background:#003366;
-    color:white;
-    padding:10px;
-    text-align:center;
-}
-
-.day{
-    min-height:100px;
-    border:1px solid #eee;
-    padding:6px;
-}
-
-.day-number{
-    font-weight:bold;
-    margin-bottom:4px;
-}
-
-.event{
-    background:#dbeafe;
-    border-radius:6px;
-    padding:4px;
-    font-size:11px;
-    margin-top:3px;
-}
-
-@media(max-width:768px){
-
-    .tabs{
-        flex-direction:column;
+    if(!end || start===end){
+        return start;
     }
 
-    .day{
-        min-height:70px;
+    const s = start.split(".");
+    const e = end.split(".");
+
+    if(
+        s[0]===e[0] &&
+        s[1]===e[1]
+    ){
+        return `${start}-${e[2]}`;
     }
 
-    .event{
-        font-size:10px;
+    return `${start} ~ ${end}`;
+}
+
+function getStatus(item){
+
+    const today = new Date();
+
+    today.setHours(0,0,0,0);
+
+    const start = parseDate(item.start);
+    const end = parseDate(item.end);
+
+    if(end < today){
+        return "finished";
+    }
+
+    if(start <= today && end >= today){
+        return "live";
+    }
+
+    return "upcoming";
+}
+
+async function loadData(){
+
+    try{
+
+        const response = await fetch(CSV_URL);
+
+        const text = await response.text();
+
+        const rows = text.trim().split("\n");
+
+        rows.shift();
+
+        competitions = rows.map(row=>{
+
+            const cols = row.split(",");
+
+            return{
+
+                start: cols[0] || "",
+                end: cols[1] || "",
+                title: cols[2] || "",
+                place: cols[3] || "",
+                type: cols[4] || "",
+                target: cols[5] || "",
+                category: cols[6] || "",
+                note: cols[7] || "",
+                result: cols[8] || ""
+
+            };
+
+        });
+
+        competitions.sort((a,b)=>
+            parseDate(a.start)-parseDate(b.start)
+        );
+
+        renderSchedule();
+        renderArchive();
+        renderCalendar();
+
+    }catch(error){
+
+        document.getElementById("schedule").innerHTML=
+        "<h3>데이터를 불러오지 못했습니다.</h3>";
+
+        console.error(error);
     }
 }
 
-</style>
-</head>
+function createCard(item){
 
-<body>
+    const status = getStatus(item);
 
-<header>
-    <h1>쇼트트랙 대회 일정</h1>
-</header>
+    let badge = "";
 
-<div class="search-wrap">
-    <input
-        type="text"
-        id="searchInput"
-        placeholder="대회명 또는 장소 검색">
-</div>
+    if(status==="live"){
+        badge =
+        '<span class="badge live">진행중</span>';
+    }
 
-<div class="tabs">
-    <button class="tab-btn active" data-tab="schedule">
-        일정
-    </button>
+    if(status==="upcoming"){
+        badge =
+        '<span class="badge upcoming">예정</span>';
+    }
 
-    <button class="tab-btn" data-tab="calendar">
-        달력
-    </button>
+    if(status==="finished"){
+        badge =
+        '<span class="badge finished">종료</span>';
+    }
 
-    <button class="tab-btn" data-tab="archive">
-        종료대회
-    </button>
-</div>
+    return `
 
-<div class="container">
+    <div class="card">
 
-    <div id="schedule" class="tab-content active">
-    </div>
+        <div class="summary">
 
-    <div id="calendar" class="tab-content">
-
-        <div class="calendar-nav">
-
-            <button id="prevMonth">
-                ◀
-            </button>
-
-            <div class="calendar-title" id="calendarTitle">
+            <div class="date">
+                ${formatDateRange(item.start,item.end)}
             </div>
 
-            <button id="nextMonth">
-                ▶
-            </button>
+            <div class="title">
+                ${item.title}
+            </div>
+
+            <div class="place">
+                ${item.place}
+            </div>
+
+            ${badge}
 
         </div>
 
-        <div class="calendar" id="calendarContainer">
+        <div class="detail">
+
+            <p><b>구분</b> : ${item.type}</p>
+
+            <p><b>참가대상</b> : ${item.target}</p>
+
+            <p><b>분류</b> : ${item.category}</p>
+
+            <p><b>비고</b> : ${item.note || "-"}</p>
+
+            <p><b>경기결과</b> :
+            ${item.result || "등록 전"}
+            </p>
+
         </div>
 
     </div>
 
-    <div id="archive" class="tab-content">
-    </div>
+    `;
+}
 
-</div>
-function renderCalendar(){
+function attachCardEvents(){
+
+    document
+    .querySelectorAll(".summary")
+    .forEach(el=>{
+
+        el.addEventListener("click",()=>{
+
+            el.parentElement
+            .classList
+            .toggle("open");
+
+        });
+
+    });
+
+}
+
+function renderSchedule(){
+
+    const container =
+    document.getElementById("schedule");
+
+    const upcoming =
+    competitions.filter(item=>
+        getStatus(item)!=="finished"
+    );
+
+    container.innerHTML =
+    upcoming.map(createCard).join("");
+
+    attachCardEvents();
+}
+
+function renderArchive(){
+
+    const container =
+    document.getElementById("archive");
+
+    const archive =
+    competitions.filter(item=>
+        getStatus(item)==="finished"
+    );
+
+    archive.reverse();
+
+    container.innerHTML =
+    archive.map(createCard).join("");
+
+    attachCardEvents();
+}
+
+document
+.getElementById("searchInput")
+.addEventListener("input",(e)=>{
+
+    const keyword =
+    e.target.value.toLowerCase();
+
+    const filtered =
+    competitions.filter(item=>
+
+        item.title
+        .toLowerCase()
+        .includes(keyword)
+
+        ||
+
+        item.place
+        .toLowerCase()
+        .includes(keyword)
+
+    );
+
+    document
+    .getElementById("schedule")
+    .innerHTML =
+    filtered
+    .filter(i=>getStatus(i)!=="finished")
+    .map(createCard)
+    .join("");
+
+    attachCardEvents();
+
+});
+
+document
+.querySelectorAll(".tab-btn")
+.forEach(btn=>{
+
+    btn.addEventListener("click",()=>{
+
+        document
+        .querySelectorAll(".tab-btn")
+        .forEach(b=>b.classList.remove("active"));
+
+        document
+        .querySelectorAll(".tab-content")
+        .forEach(c=>c.classList.remove("active"));
+
+        btn.classList.add("active");
+
+        document
+        .getElementById(btn.dataset.tab)
+        .classList.add("active");
+
+    });
+
+});
+    function renderCalendar(){
 
     const calendar =
     document.getElementById("calendarContainer");
