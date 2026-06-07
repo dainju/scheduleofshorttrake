@@ -58,10 +58,6 @@ button{
     cursor:pointer;
 }
 
-button:hover{
-    opacity:0.9;
-}
-
 .detail{
     display:none;
     margin-top:15px;
@@ -109,7 +105,7 @@ async function loadCSV(){
 
         container.innerHTML = "";
 
-        rows.forEach(row=>{
+        rows.forEach(row => {
 
             const cols = row.split(",");
 
@@ -122,7 +118,6 @@ async function loadCSV(){
 
             container.innerHTML += `
             <div class="card">
-
                 <div class="date">${date}</div>
 
                 <div class="title">
@@ -142,16 +137,18 @@ async function loadCSV(){
                     <p><b>참가대상:</b> ${target}</p>
                     <p><b>분류:</b> ${category}</p>
                 </div>
-
             </div>
             `;
         });
 
     }catch(error){
 
-        container.innerHTML =
-        "<h3>CSV 파일을 불러올 수 없습니다.</h3>" +
-        "<p>파일명이 정확히 '소트 프로그램3.csv'인지 확인하세요.</p>";
+        container.innerHTML = `
+        <div class="card">
+            <h3>CSV 파일을 불러올 수 없습니다.</h3>
+            <p>파일명이 정확히 "소트 프로그램3.csv"인지 확인하세요.</p>
+        </div>
+        `;
 
         console.error(error);
     }
