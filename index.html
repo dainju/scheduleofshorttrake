@@ -1,108 +1,52 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>쇼트트랙 대회 일정</title>
+async function loadCSV() {
+    const response = await fetch("소트 프로그램3.csv");
+    const text = await response.text();
 
-<style>
-body{
-    font-family: Arial, sans-serif;
-    background:#f5f5f5;
-    margin:0;
+    const rows = text.trim().split("\n");
+    rows.shift(); // 헤더 제거
+
+    const container = document.querySelector(".container");
+    container.innerHTML = "";
+
+    rows.forEach(row => {
+        const cols = row.split(",");
+
+        const date = cols[0] || "";
+        const title = cols[1] || "";
+        const place = cols[2] || "";
+        const type = cols[3] || "";
+        const target = cols[4] || "";
+        const category = cols[5] || "";
+
+        container.innerHTML += `
+        <div class="card">
+            <div class="date">${date}</div>
+            <div class="title">${title}</div>
+            <div class="place">${place}</div>
+
+            <button onclick="toggleDetail(this)">
+            자세히 보기
+            </button>
+
+            <div class="detail">
+                <p><b>구분:</b> ${type}</p>
+                <p><b>참가대상:</b> ${target}</p>
+                <p><b>분류:</b> ${category}</p>
+            </div>
+        </div>`;
+    });
 }
 
-header{
-    background:#003366;
-    color:white;
-    text-align:center;
-    padding:20px;
-}
+loadCSV();
 
-.container{
-    max-width:1000px;
-    margin:auto;
-    padding:20px;
-}
-
-.card{
-    background:white;
-    margin-bottom:15px;
-    border-radius:10px;
-    padding:15px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-}
-
-.date{
-    color:#666;
-    font-size:14px;
-}
-
-.title{
-    font-size:20px;
-    font-weight:bold;
-    margin:10px 0;
-}
-
-.place{
-    color:#0077cc;
-}
-
-button{
-    background:#0077cc;
-    color:white;
-    border:none;
-    padding:10px 15px;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-.detail{
-    display:none;
-    margin-top:15px;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-<h1>쇼트트랙 대회 일정</h1>
-</header>
-
-<div class="container">
-
-<div class="card">
-<div class="date">2026.04.25</div>
-<div class="title">2026 전국생활체육대축전 빙상대회</div>
-<div class="place">창원 의창</div>
-
-<button onclick="toggleDetail(this)">
-자세히 보기
-</button>
-
-<div class="detail">
-<p>세부 정보 입력</p>
-<p>참가 대상 입력</p>
-<p>경기 결과 입력</p>
-</div>
-</div>
-
-</div>
-
-<script>
 function toggleDetail(button){
-const detail = button.nextElementSibling;
+    const detail = button.nextElementSibling;
 
-if(detail.style.display==="block"){
-detail.style.display="none";
-button.innerText="자세히 보기";
-}else{
-detail.style.display="block";
-button.innerText="닫기";
+    if(detail.style.display==="block"){
+        detail.style.display="none";
+        button.innerText="자세히 보기";
+    }else{
+        detail.style.display="block";
+        button.innerText="닫기";
+    }
 }
-}
-</script>
-
-</body>
-</html>
