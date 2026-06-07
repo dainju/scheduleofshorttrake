@@ -23,7 +23,7 @@ color:#222;
 header{
 background:#003b78;
 color:white;
-padding:25px;
+padding:24px;
 text-align:center;
 font-size:30px;
 font-weight:bold;
@@ -39,27 +39,29 @@ padding:20px;
 width:100%;
 padding:14px;
 border:none;
-border-radius:10px;
+border-radius:12px;
 font-size:16px;
 margin-bottom:20px;
-box-shadow:0 2px 6px rgba(0,0,0,.08);
+box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
 .tabs{
 display:flex;
+flex-wrap:wrap;
 gap:10px;
 margin-bottom:20px;
 }
 
 .tab{
 flex:1;
+min-width:140px;
 padding:14px;
 border:none;
 border-radius:10px;
+background:white;
 cursor:pointer;
 font-weight:bold;
-background:white;
-box-shadow:0 2px 6px rgba(0,0,0,.08);
+box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
 .tab.active{
@@ -69,8 +71,8 @@ color:white;
 
 .card{
 background:white;
-border-radius:12px;
 padding:18px;
+border-radius:12px;
 margin-bottom:15px;
 box-shadow:0 2px 8px rgba(0,0,0,.08);
 cursor:pointer;
@@ -83,7 +85,7 @@ transform:translateY(-2px);
 
 .date{
 font-size:14px;
-color:#777;
+color:#666;
 margin-bottom:8px;
 }
 
@@ -97,9 +99,31 @@ margin-bottom:8px;
 color:#0066cc;
 }
 
+.badge{
+display:inline-block;
+padding:4px 10px;
+border-radius:999px;
+font-size:12px;
+margin-top:10px;
+}
+
+.badge-upcoming{
+background:#dbeafe;
+}
+
+.badge-live{
+background:#dcfce7;
+}
+
+.badge-finished{
+background:#e5e7eb;
+}
+
 .hidden{
 display:none;
 }
+
+/* 달력 */
 
 .calendar-nav{
 display:flex;
@@ -112,9 +136,9 @@ margin-bottom:20px;
 .calendar-nav button{
 padding:8px 15px;
 border:none;
+border-radius:8px;
 background:#003b78;
 color:white;
-border-radius:8px;
 cursor:pointer;
 }
 
@@ -128,15 +152,15 @@ background:#ddd;
 .day-header{
 background:#003b78;
 color:white;
-padding:10px;
 text-align:center;
+padding:10px;
 font-weight:bold;
 }
 
 .day{
 background:white;
 min-height:110px;
-padding:6px;
+padding:5px;
 }
 
 .day-number{
@@ -145,36 +169,16 @@ margin-bottom:5px;
 }
 
 .event{
-background:#e7f1ff;
+background:#e8f1ff;
+border-radius:5px;
 padding:4px;
 margin-top:4px;
-border-radius:6px;
 font-size:11px;
 cursor:pointer;
 }
 
 .event:hover{
-background:#d3e7ff;
-}
-
-.badge{
-display:inline-block;
-padding:4px 8px;
-border-radius:999px;
-font-size:12px;
-margin-top:8px;
-}
-
-.live{
-background:#d4f8d4;
-}
-
-.upcoming{
-background:#dbeafe;
-}
-
-.finished{
-background:#e5e7eb;
+background:#d6e8ff;
 }
 
 /* 모달 */
@@ -186,20 +190,20 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-background:rgba(0,0,0,.6);
-z-index:999;
+background:rgba(0,0,0,.55);
 justify-content:center;
 align-items:center;
+z-index:999;
 padding:20px;
 }
 
 .modal-content{
 background:white;
-max-width:700px;
 width:100%;
+max-width:700px;
 border-radius:14px;
 padding:25px;
-max-height:80vh;
+max-height:85vh;
 overflow:auto;
 }
 
@@ -207,6 +211,11 @@ overflow:auto;
 font-size:24px;
 font-weight:bold;
 margin-bottom:15px;
+}
+
+.info-row{
+margin-bottom:12px;
+line-height:1.7;
 }
 
 .close-btn{
@@ -219,19 +228,12 @@ border-radius:8px;
 cursor:pointer;
 }
 
-.info-row{
-margin-bottom:12px;
-line-height:1.6;
-}
+/* 모바일 */
 
 @media(max-width:768px){
 
 header{
 font-size:24px;
-}
-
-.tabs{
-flex-direction:column;
 }
 
 .title{
@@ -246,8 +248,8 @@ min-height:80px;
 font-size:10px;
 }
 
-.modal-content{
-padding:18px;
+.tab{
+min-width:100%;
 }
 
 }
@@ -271,27 +273,45 @@ placeholder="대회명 또는 장소 검색">
 
 <div class="tabs">
 
-<button
-class="tab active"
+<button class="tab active"
 onclick="showTab('schedule')">
-일정
+전체 일정
 </button>
 
-<button
-class="tab"
+<button class="tab"
+onclick="showTab('month')">
+이번달 경기
+</button>
+
+<button class="tab"
+onclick="showTab('domestic')">
+국내 대회
+</button>
+
+<button class="tab"
+onclick="showTab('international')">
+국제 대회
+</button>
+
+<button class="tab"
 onclick="showTab('calendar')">
 달력
 </button>
 
-<button
-class="tab"
+<button class="tab"
 onclick="showTab('past')">
-종료대회
+종료 대회
 </button>
 
 </div>
 
 <div id="scheduleTab"></div>
+
+<div id="monthTab" class="hidden"></div>
+
+<div id="domesticTab" class="hidden"></div>
+
+<div id="internationalTab" class="hidden"></div>
 
 <div id="calendarTab" class="hidden">
 
@@ -301,8 +321,7 @@ onclick="showTab('past')">
 ◀
 </button>
 
-<h2 id="calendarTitle">
-</h2>
+<h2 id="calendarTitle"></h2>
 
 <button id="nextMonth">
 ▶
@@ -347,6 +366,8 @@ if(!str) return null;
 
 const p = str.trim().split(".");
 
+if(p.length !== 3) return null;
+
 return new Date(
 Number(p[0]),
 Number(p[1])-1,
@@ -361,17 +382,8 @@ if(!end || start===end){
 return start;
 }
 
-const s = start.split(".");
-const e = end.split(".");
-
-if(
-s[0]===e[0] &&
-s[1]===e[1]
-){
-return `${start}-${e[2]}`;
-}
-
 return `${start} ~ ${end}`;
+
 }
 
 function getStatus(item){
@@ -382,6 +394,10 @@ today.setHours(0,0,0,0);
 
 const start = parseDate(item.start);
 const end = parseDate(item.end);
+
+if(!start || !end){
+return "upcoming";
+}
 
 if(end < today){
 return "finished";
@@ -400,14 +416,14 @@ function getBadge(item){
 const status = getStatus(item);
 
 if(status==="live"){
-return '<span class="badge live">진행중</span>';
+return '<span class="badge badge-live">진행중</span>';
 }
 
 if(status==="finished"){
-return '<span class="badge finished">종료</span>';
+return '<span class="badge badge-finished">종료</span>';
 }
 
-return '<span class="badge upcoming">예정</span>';
+return '<span class="badge badge-upcoming">예정</span>';
 
 }
 
@@ -422,62 +438,64 @@ ${item.title}
 </div>
 
 <div class="info-row">
-📅 ${formatRange(item.start,item.end)}
+📅 <b>기간</b><br>
+${formatRange(item.start,item.end)}
 </div>
 
 <div class="info-row">
-📍 ${item.place}
+📍 <b>장소</b><br>
+${item.place || "-"}
 </div>
 
 <div class="info-row">
-<b>구분</b><br>
+🏷️ <b>구분</b><br>
 ${item.type || "-"}
 </div>
 
 <div class="info-row">
-<b>참가대상</b><br>
+👥 <b>참가대상</b><br>
 ${item.target || "-"}
 </div>
 
 <div class="info-row">
-<b>분류</b><br>
+📂 <b>분류</b><br>
 ${item.category || "-"}
 </div>
 
 <div class="info-row">
-<b>비고</b><br>
+📝 <b>비고</b><br>
 ${item.note || "-"}
 </div>
 
 <div class="info-row">
-<b>경기결과</b><br>
+🏆 <b>경기결과</b><br>
 ${item.result || "등록 전"}
 </div>
 
 `;
 
 document.getElementById("detailModal")
-.style.display="flex";
+.style.display = "flex";
 
 }
 
 function closeModal(){
 
 document.getElementById("detailModal")
-.style.display="none";
+.style.display = "none";
 
 }
 
-window.onclick=function(e){
+window.addEventListener("click",(e)=>{
 
 const modal =
 document.getElementById("detailModal");
 
-if(e.target===modal){
+if(e.target === modal){
 closeModal();
 }
 
-}
+});
 
 function createCard(item,index){
 
@@ -507,341 +525,97 @@ ${getBadge(item)}
 
 }
 
-function renderSchedule(){
+function renderTabs(){
+
+const schedule =
+document.getElementById("scheduleTab");
+
+const month =
+document.getElementById("monthTab");
+
+const domestic =
+document.getElementById("domesticTab");
+
+const international =
+document.getElementById("internationalTab");
+
+const past =
+document.getElementById("pastTab");
 
 const keyword =
-document
-.getElementById("search")
+document.getElementById("search")
 .value
 .toLowerCase();
 
 const today = new Date();
 
-let upcoming = "";
-let finished = "";
+let allHtml = "";
+let monthHtml = "";
+let domesticHtml = "";
+let internationalHtml = "";
+let pastHtml = "";
 
 competitions.forEach((item,index)=>{
 
-const match =
+const title =
+(item.title || "")
+.toLowerCase();
 
-item.title.toLowerCase().includes(keyword)
-
-||
-
-item.place.toLowerCase().includes(keyword);
-
-if(!match){
-return;
-}
-
-const end = parseDate(item.end);
-
-if(end < today){
-
-finished += createCard(item,index);
-
-}else{
-
-upcoming += createCard(item,index);
-
-}
-
-});
-
-document
-.getElementById("scheduleTab")
-.innerHTML = upcoming;
-
-document
-.getElementById("pastTab")
-.innerHTML = finished;
-
-}
-
-function showTab(tab){
-
-document
-.querySelectorAll(".tab")
-.forEach(btn=>btn.classList.remove("active"));
-
-document
-.querySelectorAll(".tab")
-.forEach(btn=>{
-
-if(btn.innerText==="일정" && tab==="schedule"){
-btn.classList.add("active");
-}
-
-if(btn.innerText==="달력" && tab==="calendar"){
-btn.classList.add("active");
-}
-
-if(btn.innerText==="종료대회" && tab==="past"){
-btn.classList.add("active");
-}
-
-});
-
-document
-.getElementById("scheduleTab")
-.classList.add("hidden");
-
-document
-.getElementById("calendarTab")
-.classList.add("hidden");
-
-document
-.getElementById("pastTab")
-.classList.add("hidden");
-
-if(tab==="schedule"){
-document
-.getElementById("scheduleTab")
-.classList.remove("hidden");
-}
-
-if(tab==="calendar"){
-document
-.getElementById("calendarTab")
-.classList.remove("hidden");
-}
-
-if(tab==="past"){
-document
-.getElementById("pastTab")
-.classList.remove("hidden");
-}
-
-}
-
-document
-.getElementById("search")
-.addEventListener(
-"input",
-renderSchedule
-);
-  <script>
-
-const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vTRV-lLroEFMXiMaricD-GkYcWOyt8cwT6Z6f49GlqbJVwXMQdJllhzPc_gg8io9x6B-z0o_tk3Xbdl/pub?output=csv";
-
-let competitions = [];
-let currentDate = new Date();
-
-function parseDate(str){
-
-if(!str) return null;
-
-const p = str.trim().split(".");
-
-return new Date(
-Number(p[0]),
-Number(p[1])-1,
-Number(p[2])
-);
-
-}
-
-function formatRange(start,end){
-
-if(!end || start===end){
-return start;
-}
-
-const s = start.split(".");
-const e = end.split(".");
+const place =
+(item.place || "")
+.toLowerCase();
 
 if(
-s[0]===e[0] &&
-s[1]===e[1]
+!title.includes(keyword) &&
+!place.includes(keyword)
 ){
-return `${start}-${e[2]}`;
-}
-
-return `${start} ~ ${end}`;
-}
-
-function getStatus(item){
-
-const today = new Date();
-
-today.setHours(0,0,0,0);
-
-const start = parseDate(item.start);
-const end = parseDate(item.end);
-
-if(end < today){
-return "finished";
-}
-
-if(start <= today && end >= today){
-return "live";
-}
-
-return "upcoming";
-
-}
-
-function getBadge(item){
-
-const status = getStatus(item);
-
-if(status==="live"){
-return '<span class="badge live">진행중</span>';
-}
-
-if(status==="finished"){
-return '<span class="badge finished">종료</span>';
-}
-
-return '<span class="badge upcoming">예정</span>';
-
-}
-
-function openModal(index){
-
-const item = competitions[index];
-
-document.getElementById("modalBody").innerHTML = `
-
-<div class="modal-title">
-${item.title}
-</div>
-
-<div class="info-row">
-📅 ${formatRange(item.start,item.end)}
-</div>
-
-<div class="info-row">
-📍 ${item.place}
-</div>
-
-<div class="info-row">
-<b>구분</b><br>
-${item.type || "-"}
-</div>
-
-<div class="info-row">
-<b>참가대상</b><br>
-${item.target || "-"}
-</div>
-
-<div class="info-row">
-<b>분류</b><br>
-${item.category || "-"}
-</div>
-
-<div class="info-row">
-<b>비고</b><br>
-${item.note || "-"}
-</div>
-
-<div class="info-row">
-<b>경기결과</b><br>
-${item.result || "등록 전"}
-</div>
-
-`;
-
-document.getElementById("detailModal")
-.style.display="flex";
-
-}
-
-function closeModal(){
-
-document.getElementById("detailModal")
-.style.display="none";
-
-}
-
-window.onclick=function(e){
-
-const modal =
-document.getElementById("detailModal");
-
-if(e.target===modal){
-closeModal();
-}
-
-}
-
-function createCard(item,index){
-
-return `
-
-<div
-class="card"
-onclick="openModal(${index})">
-
-<div class="date">
-${formatRange(item.start,item.end)}
-</div>
-
-<div class="title">
-${item.title}
-</div>
-
-<div class="place">
-${item.place}
-</div>
-
-${getBadge(item)}
-
-</div>
-
-`;
-
-}
-
-function renderSchedule(){
-
-const keyword =
-document
-.getElementById("search")
-.value
-.toLowerCase();
-
-const today = new Date();
-
-let upcoming = "";
-let finished = "";
-
-competitions.forEach((item,index)=>{
-
-const match =
-
-item.title.toLowerCase().includes(keyword)
-
-||
-
-item.place.toLowerCase().includes(keyword);
-
-if(!match){
 return;
 }
 
-const end = parseDate(item.end);
+const start =
+parseDate(item.start);
 
-if(end < today){
+const end =
+parseDate(item.end);
 
-finished += createCard(item,index);
+const card =
+createCard(item,index);
 
-}else{
+if(end && end < today){
 
-upcoming += createCard(item,index);
+pastHtml += card;
+return;
+
+}
+
+allHtml += card;
+
+if(item.type === "국내"){
+domesticHtml += card;
+}
+
+if(item.type === "국제"){
+internationalHtml += card;
+}
+
+if(start){
+
+if(
+start.getMonth() === today.getMonth() &&
+start.getFullYear() === today.getFullYear()
+){
+monthHtml += card;
+}
 
 }
 
 });
 
-document
-.getElementById("scheduleTab")
-.innerHTML = upcoming;
-
-document
-.getElementById("pastTab")
-.innerHTML = finished;
+schedule.innerHTML = allHtml;
+month.innerHTML = monthHtml;
+domestic.innerHTML = domesticHtml;
+international.innerHTML = internationalHtml;
+past.innerHTML = pastHtml;
 
 }
 
@@ -849,55 +623,42 @@ function showTab(tab){
 
 document
 .querySelectorAll(".tab")
-.forEach(btn=>btn.classList.remove("active"));
+.forEach(btn=>{
+btn.classList.remove("active");
+});
+
+const map = {
+schedule:0,
+month:1,
+domestic:2,
+international:3,
+calendar:4,
+past:5
+};
 
 document
 .querySelectorAll(".tab")
-.forEach(btn=>{
+[map[tab]]
+.classList.add("active");
 
-if(btn.innerText==="일정" && tab==="schedule"){
-btn.classList.add("active");
-}
+[
+"scheduleTab",
+"monthTab",
+"domesticTab",
+"internationalTab",
+"calendarTab",
+"pastTab"
+].forEach(id=>{
 
-if(btn.innerText==="달력" && tab==="calendar"){
-btn.classList.add("active");
-}
-
-if(btn.innerText==="종료대회" && tab==="past"){
-btn.classList.add("active");
-}
+document
+.getElementById(id)
+.classList.add("hidden");
 
 });
 
 document
-.getElementById("scheduleTab")
-.classList.add("hidden");
-
-document
-.getElementById("calendarTab")
-.classList.add("hidden");
-
-document
-.getElementById("pastTab")
-.classList.add("hidden");
-
-if(tab==="schedule"){
-document
-.getElementById("scheduleTab")
+.getElementById(tab+"Tab")
 .classList.remove("hidden");
-}
-
-if(tab==="calendar"){
-document
-.getElementById("calendarTab")
-.classList.remove("hidden");
-}
-
-if(tab==="past"){
-document
-.getElementById("pastTab")
-.classList.remove("hidden");
-}
 
 }
 
@@ -905,5 +666,272 @@ document
 .getElementById("search")
 .addEventListener(
 "input",
-renderSchedule
+renderTabs
 );
+  function renderCalendar(){
+
+const year =
+currentDate.getFullYear();
+
+const month =
+currentDate.getMonth();
+
+document
+.getElementById("calendarTitle")
+.textContent =
+`${year}년 ${month+1}월`;
+
+const firstDay =
+new Date(year,month,1);
+
+const lastDay =
+new Date(year,month+1,0);
+
+let html = `
+<div class="calendar-grid">
+`;
+
+["일","월","화","수","목","금","토"]
+.forEach(day=>{
+
+html += `
+<div class="day-header">
+${day}
+</div>
+`;
+
+});
+
+for(
+let i=0;
+i<firstDay.getDay();
+i++
+){
+
+html += `
+<div class="day"></div>
+`;
+
+}
+
+for(
+let day=1;
+day<=lastDay.getDate();
+day++
+){
+
+html += `
+<div class="day">
+
+<div class="day-number">
+${day}
+</div>
+`;
+
+competitions.forEach((item,index)=>{
+
+const start =
+parseDate(item.start);
+
+const end =
+parseDate(item.end);
+
+if(
+!start ||
+!end
+){
+return;
+}
+
+const current =
+new Date(
+year,
+month,
+day
+);
+
+if(
+current >= start &&
+current <= end
+){
+
+html += `
+<div
+class="event"
+onclick="openModal(${index})">
+
+${item.title}
+
+</div>
+`;
+
+}
+
+});
+
+html += `
+</div>
+`;
+
+}
+
+html += `
+</div>
+`;
+
+document
+.getElementById("calendarContainer")
+.innerHTML = html;
+
+}
+
+function parseCSVLine(line){
+
+const result = [];
+
+let current = "";
+
+let insideQuotes = false;
+
+for(
+let i=0;
+i<line.length;
+i++
+){
+
+const char = line[i];
+
+if(char === '"'){
+
+insideQuotes =
+!insideQuotes;
+
+continue;
+
+}
+
+if(
+char === "," &&
+!insideQuotes
+){
+
+result.push(current);
+current = "";
+continue;
+
+}
+
+current += char;
+
+}
+
+result.push(current);
+
+return result;
+
+}
+
+async function loadData(){
+
+try{
+
+const response =
+await fetch(CSV_URL);
+
+const text =
+await response.text();
+
+const rows =
+text
+.trim()
+.split("\n");
+
+rows.shift();
+
+competitions = [];
+
+rows.forEach(row=>{
+
+const c =
+parseCSVLine(row);
+
+competitions.push({
+
+start: c[0] || "",
+end: c[1] || "",
+title: c[2] || "",
+place: c[3] || "",
+type: c[4] || "",
+target: c[5] || "",
+category: c[6] || "",
+note: c[7] || "",
+result: c[8] || ""
+
+});
+
+});
+
+competitions.sort((a,b)=>{
+
+const da =
+parseDate(a.start);
+
+const db =
+parseDate(b.start);
+
+if(!da || !db){
+return 0;
+}
+
+return da-db;
+
+});
+
+renderTabs();
+renderCalendar();
+
+}catch(error){
+
+console.error(error);
+
+document
+.getElementById("scheduleTab")
+.innerHTML = `
+<h3>
+데이터를 불러오지 못했습니다.
+</h3>
+`;
+
+}
+
+}
+  document
+.getElementById("prevMonth")
+.addEventListener("click",()=>{
+
+currentDate.setMonth(
+currentDate.getMonth()-1
+);
+
+renderCalendar();
+
+});
+
+document
+.getElementById("nextMonth")
+.addEventListener("click",()=>{
+
+currentDate.setMonth(
+currentDate.getMonth()+1
+);
+
+renderCalendar();
+
+});
+
+loadData();
+
+</script>
+
+</body>
+</html>
