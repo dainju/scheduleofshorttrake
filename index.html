@@ -1,52 +1,165 @@
-async function loadCSV() {
-    const response = await fetch("소트 프로그램3.csv");
-    const text = await response.text();
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>쇼트트랙 대회 일정</title>
 
-    const rows = text.trim().split("\n");
-    rows.shift(); // 헤더 제거
-
-    const container = document.querySelector(".container");
-    container.innerHTML = "";
-
-    rows.forEach(row => {
-        const cols = row.split(",");
-
-        const date = cols[0] || "";
-        const title = cols[1] || "";
-        const place = cols[2] || "";
-        const type = cols[3] || "";
-        const target = cols[4] || "";
-        const category = cols[5] || "";
-
-        container.innerHTML += `
-        <div class="card">
-            <div class="date">${date}</div>
-            <div class="title">${title}</div>
-            <div class="place">${place}</div>
-
-            <button onclick="toggleDetail(this)">
-            자세히 보기
-            </button>
-
-            <div class="detail">
-                <p><b>구분:</b> ${type}</p>
-                <p><b>참가대상:</b> ${target}</p>
-                <p><b>분류:</b> ${category}</p>
-            </div>
-        </div>`;
-    });
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f5f5;
+    margin:0;
 }
 
-loadCSV();
+header{
+    background:#003366;
+    color:white;
+    text-align:center;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    margin-bottom:15px;
+    border-radius:10px;
+    padding:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.date{
+    color:#666;
+    font-size:14px;
+}
+
+.title{
+    font-size:22px;
+    font-weight:bold;
+    margin:10px 0;
+}
+
+.place{
+    color:#0077cc;
+    margin-bottom:10px;
+}
+
+button{
+    background:#0077cc;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.detail{
+    display:none;
+    margin-top:15px;
+    line-height:1.8;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>쇼트트랙 대회 일정</h1>
+</header>
+
+<div class="container" id="scheduleContainer">
+로딩 중...
+</div>
+
+<script>
 
 function toggleDetail(button){
     const detail = button.nextElementSibling;
 
-    if(detail.style.display==="block"){
-        detail.style.display="none";
-        button.innerText="자세히 보기";
+    if(detail.style.display === "block"){
+        detail.style.display = "none";
+        button.innerText = "자세히 보기";
     }else{
-        detail.style.display="block";
-        button.innerText="닫기";
+        detail.style.display = "block";
+        button.innerText = "닫기";
     }
 }
+
+async function loadCSV(){
+
+    const container = document.getElementById("scheduleContainer");
+
+    try{
+
+        const response = await fetch("소트 프로그램3.csv");
+        const csvText = await response.text();
+
+        const rows = csvText.trim().split("\n");
+
+        rows.shift();
+
+        container.innerHTML = "";
+
+        rows.forEach(row=>{
+
+            const cols = row.split(",");
+
+            const date = cols[0] || "";
+            const title = cols[1] || "";
+            const place = cols[2] || "";
+            const type = cols[3] || "";
+            const target = cols[4] || "";
+            const category = cols[5] || "";
+
+            container.innerHTML += `
+            <div class="card">
+
+                <div class="date">${date}</div>
+
+                <div class="title">
+                    ${title}
+                </div>
+
+                <div class="place">
+                    ${place}
+                </div>
+
+                <button onclick="toggleDetail(this)">
+                    자세히 보기
+                </button>
+
+                <div class="detail">
+                    <p><b>구분:</b> ${type}</p>
+                    <p><b>참가대상:</b> ${target}</p>
+                    <p><b>분류:</b> ${category}</p>
+                </div>
+
+            </div>
+            `;
+        });
+
+    }catch(error){
+
+        container.innerHTML =
+        "<h3>CSV 파일을 불러올 수 없습니다.</h3>" +
+        "<p>파일명이 정확히 '소트 프로그램3.csv'인지 확인하세요.</p>";
+
+        console.error(error);
+    }
+}
+
+loadCSV();
+
+</script>
+
+</body>
+</html>
