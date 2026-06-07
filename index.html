@@ -39,7 +39,7 @@ header{
 }
 
 .title{
-    font-size:22px;
+    font-size:20px;
     font-weight:bold;
     margin:10px 0;
 }
@@ -81,43 +81,44 @@ button{
 function toggleDetail(button){
     const detail = button.nextElementSibling;
 
-    if(detail.style.display === "block"){
-        detail.style.display = "none";
-        button.innerText = "자세히 보기";
+    if(detail.style.display==="block"){
+        detail.style.display="none";
+        button.innerText="자세히 보기";
     }else{
-        detail.style.display = "block";
-        button.innerText = "닫기";
+        detail.style.display="block";
+        button.innerText="닫기";
     }
 }
 
 async function loadCSV(){
 
-    const container = document.getElementById("scheduleContainer");
+    const container=document.getElementById("scheduleContainer");
 
     try{
 
-        const response = await fetch("소트 프로그램3.csv");
-        const csvText = await response.text();
+        const response=await fetch("소트 프로그램3.csv");
+        const csvText=await response.text();
 
-        const rows = csvText.trim().split("\n");
+        const rows=csvText.trim().split("\n");
 
         rows.shift();
 
-        container.innerHTML = "";
+        container.innerHTML="";
 
-        rows.forEach(row => {
+        rows.forEach(row=>{
 
-            const cols = row.split(",");
+            const cols=row.split(",");
 
-            const date = cols[0] || "";
-            const title = cols[1] || "";
-            const place = cols[2] || "";
-            const type = cols[3] || "";
-            const target = cols[4] || "";
-            const category = cols[5] || "";
+            const date=cols[0]||"";
+            const title=cols[1]||"";
+            const place=cols[2]||"";
+            const type=cols[3]||"";
+            const target=cols[4]||"";
+            const category=cols[5]||"";
 
-            container.innerHTML += `
+            container.innerHTML+=`
             <div class="card">
+
                 <div class="date">${date}</div>
 
                 <div class="title">
@@ -137,13 +138,14 @@ async function loadCSV(){
                     <p><b>참가대상:</b> ${target}</p>
                     <p><b>분류:</b> ${category}</p>
                 </div>
+
             </div>
             `;
         });
 
     }catch(error){
 
-        container.innerHTML = `
+        container.innerHTML=`
         <div class="card">
             <h3>CSV 파일을 불러올 수 없습니다.</h3>
             <p>파일명이 정확히 "소트 프로그램3.csv"인지 확인하세요.</p>
