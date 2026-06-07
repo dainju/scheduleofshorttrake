@@ -7,54 +7,100 @@
 <title>쇼트트랙 대회 일정</title>
 
 <style>
+
 *{
     box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
 body{
-    margin:0;
-    background:#f4f6f8;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:#f4f6f8;
+    color:#222;
 }
 
 header{
     background:#003366;
     color:white;
-    padding:20px;
     text-align:center;
+    padding:20px;
+    position:sticky;
+    top:0;
+    z-index:100;
 }
 
-.search-box{
-    max-width:900px;
+header h1{
+    font-size:24px;
+}
+
+.search-wrap{
+    max-width:1000px;
     margin:20px auto;
     padding:0 15px;
 }
 
-.search-box input{
+#searchInput{
     width:100%;
     padding:14px;
     border:none;
-    border-radius:10px;
+    border-radius:12px;
     font-size:16px;
 }
 
+.tabs{
+    max-width:1000px;
+    margin:auto;
+    padding:0 15px;
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.tab-btn{
+    flex:1;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    background:white;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.tab-btn.active{
+    background:#003366;
+    color:white;
+}
+
 .container{
-    max-width:900px;
+    max-width:1000px;
     margin:auto;
     padding:0 15px 30px;
 }
 
+.tab-content{
+    display:none;
+}
+
+.tab-content.active{
+    display:block;
+}
+
 .card{
     background:white;
-    border-radius:12px;
+    border-radius:14px;
     margin-bottom:12px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
     overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
 .summary{
     padding:15px;
     cursor:pointer;
+}
+
+.summary:hover{
+    background:#fafafa;
 }
 
 .date{
@@ -72,156 +118,593 @@ header{
     color:#0066cc;
 }
 
+.badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:999px;
+    font-size:12px;
+    margin-top:8px;
+}
+
+.badge.live{
+    background:#d4f8d4;
+}
+
+.badge.upcoming{
+    background:#dbeafe;
+}
+
+.badge.finished{
+    background:#e5e7eb;
+}
+
 .detail{
     display:none;
     border-top:1px solid #eee;
-    padding:15px;
     background:#fafafa;
+    padding:15px;
+}
+
+.card.open .detail{
+    display:block;
 }
 
 .detail p{
-    margin:8px 0;
+    margin-bottom:8px;
 }
 
-.open .detail{
-    display:block;
+.calendar-nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
 }
+
+.calendar-nav button{
+    border:none;
+    background:#003366;
+    color:white;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.calendar-title{
+    font-weight:bold;
+    font-size:18px;
+}
+
+.calendar{
+    background:white;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.calendar-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+}
+
+.day-header{
+    background:#003366;
+    color:white;
+    padding:10px;
+    text-align:center;
+}
+
+.day{
+    min-height:100px;
+    border:1px solid #eee;
+    padding:6px;
+}
+
+.day-number{
+    font-weight:bold;
+    margin-bottom:4px;
+}
+
+.event{
+    background:#dbeafe;
+    border-radius:6px;
+    padding:4px;
+    font-size:11px;
+    margin-top:3px;
+}
+
+@media(max-width:768px){
+
+    .tabs{
+        flex-direction:column;
+    }
+
+    .day{
+        min-height:70px;
+    }
+
+    .event{
+        font-size:10px;
+    }
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>쇼트트랙 대회 일정</h1>
+    <h1>쇼트트랙 대회 일정</h1>
 </header>
 
-<div class="search-box">
-<input
-id="search"
-type="text"
-placeholder="대회명, 장소 검색">
+<div class="search-wrap">
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="대회명 또는 장소 검색">
 </div>
 
-<div id="container" class="container">
-불러오는 중...
+<div class="tabs">
+    <button class="tab-btn active" data-tab="schedule">
+        일정
+    </button>
+
+    <button class="tab-btn" data-tab="calendar">
+        달력
+    </button>
+
+    <button class="tab-btn" data-tab="archive">
+        종료대회
+    </button>
 </div>
 
-<script>
+<div class="container">
 
-const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vTXTlj2pF8TCG8PquxO8k_D1ehwsmFRZAt4hLZgPEp-MwndhhcguvcDRlwoX3SBJUd3G-RER-2TMeIO/pub?output=csv";
+    <div id="schedule" class="tab-content active">
+    </div>
 
-let allData = [];
+    <div id="calendar" class="tab-content">
 
-function parseDate(str){
+        <div class="calendar-nav">
 
-    if(!str) return new Date(9999,0,1);
+            <button id="prevMonth">
+                ◀
+            </button>
 
-    const clean = str.replace(/\./g,"-");
+            <div class="calendar-title" id="calendarTitle">
+            </div>
 
-    return new Date(clean);
+            <button id="nextMonth">
+                ▶
+            </button>
+
+        </div>
+
+        <div class="calendar" id="calendarContainer">
+        </div>
+
+    </div>
+
+    <div id="archive" class="tab-content">
+    </div>
+
+</div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>쇼트트랙 대회 일정</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-async function loadData(){
+body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:#f4f6f8;
+    color:#222;
+}
 
-    try{
+header{
+    background:#003366;
+    color:white;
+    text-align:center;
+    padding:20px;
+    position:sticky;
+    top:0;
+    z-index:100;
+}
 
-        const response = await fetch(CSV_URL);
+header h1{
+    font-size:24px;
+}
 
-        const text = await response.text();
+.search-wrap{
+    max-width:1000px;
+    margin:20px auto;
+    padding:0 15px;
+}
 
-        const rows = text.trim().split("\n");
+#searchInput{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+}
 
-        rows.shift();
+.tabs{
+    max-width:1000px;
+    margin:auto;
+    padding:0 15px;
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
 
-        allData = rows.map(row=>{
+.tab-btn{
+    flex:1;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    background:white;
+    cursor:pointer;
+    font-weight:600;
+}
 
-            const cols = row.split(",");
+.tab-btn.active{
+    background:#003366;
+    color:white;
+}
 
-            return {
-                date: cols[0] || "",
-                title: cols[1] || "",
-                place: cols[2] || "",
-                type: cols[3] || "",
-                target: cols[4] || "",
-                category: cols[5] || "",
-                result: cols[6] || ""
-            };
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:0 15px 30px;
+}
 
-        });
+.tab-content{
+    display:none;
+}
 
-        allData.sort((a,b)=>
-            parseDate(a.date)-parseDate(b.date)
-        );
+.tab-content.active{
+    display:block;
+}
 
-        render(allData);
+.card{
+    background:white;
+    border-radius:14px;
+    margin-bottom:12px;
+    overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
 
-    }catch(err){
+.summary{
+    padding:15px;
+    cursor:pointer;
+}
 
-        document.getElementById("container").innerHTML =
-        "<h3>데이터를 불러오지 못했습니다.</h3>";
+.summary:hover{
+    background:#fafafa;
+}
 
-        console.error(err);
+.date{
+    color:#666;
+    font-size:14px;
+}
+
+.title{
+    font-size:18px;
+    font-weight:700;
+    margin:8px 0;
+}
+
+.place{
+    color:#0066cc;
+}
+
+.badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:999px;
+    font-size:12px;
+    margin-top:8px;
+}
+
+.badge.live{
+    background:#d4f8d4;
+}
+
+.badge.upcoming{
+    background:#dbeafe;
+}
+
+.badge.finished{
+    background:#e5e7eb;
+}
+
+.detail{
+    display:none;
+    border-top:1px solid #eee;
+    background:#fafafa;
+    padding:15px;
+}
+
+.card.open .detail{
+    display:block;
+}
+
+.detail p{
+    margin-bottom:8px;
+}
+
+.calendar-nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.calendar-nav button{
+    border:none;
+    background:#003366;
+    color:white;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.calendar-title{
+    font-weight:bold;
+    font-size:18px;
+}
+
+.calendar{
+    background:white;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.calendar-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+}
+
+.day-header{
+    background:#003366;
+    color:white;
+    padding:10px;
+    text-align:center;
+}
+
+.day{
+    min-height:100px;
+    border:1px solid #eee;
+    padding:6px;
+}
+
+.day-number{
+    font-weight:bold;
+    margin-bottom:4px;
+}
+
+.event{
+    background:#dbeafe;
+    border-radius:6px;
+    padding:4px;
+    font-size:11px;
+    margin-top:3px;
+}
+
+@media(max-width:768px){
+
+    .tabs{
+        flex-direction:column;
+    }
+
+    .day{
+        min-height:70px;
+    }
+
+    .event{
+        font-size:10px;
     }
 }
 
-function render(data){
+</style>
+</head>
 
-    const container =
-    document.getElementById("container");
+<body>
 
-    container.innerHTML = "";
+<header>
+    <h1>쇼트트랙 대회 일정</h1>
+</header>
 
-    data.forEach(item=>{
+<div class="search-wrap">
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="대회명 또는 장소 검색">
+</div>
 
-        const card =
-        document.createElement("div");
+<div class="tabs">
+    <button class="tab-btn active" data-tab="schedule">
+        일정
+    </button>
 
-        card.className = "card";
+    <button class="tab-btn" data-tab="calendar">
+        달력
+    </button>
 
-        card.innerHTML = `
-            <div class="summary">
-                <div class="date">${item.date}</div>
-                <div class="title">${item.title}</div>
-                <div class="place">${item.place}</div>
+    <button class="tab-btn" data-tab="archive">
+        종료대회
+    </button>
+</div>
+
+<div class="container">
+
+    <div id="schedule" class="tab-content active">
+    </div>
+
+    <div id="calendar" class="tab-content">
+
+        <div class="calendar-nav">
+
+            <button id="prevMonth">
+                ◀
+            </button>
+
+            <div class="calendar-title" id="calendarTitle">
             </div>
 
-            <div class="detail">
-                <p><b>구분</b> : ${item.type}</p>
-                <p><b>참가대상</b> : ${item.target}</p>
-                <p><b>분류</b> : ${item.category}</p>
-                <p><b>경기결과</b> : ${item.result || "등록 전"}</p>
+            <button id="nextMonth">
+                ▶
+            </button>
+
+        </div>
+
+        <div class="calendar" id="calendarContainer">
+        </div>
+
+    </div>
+
+    <div id="archive" class="tab-content">
+    </div>
+
+</div>
+function renderCalendar(){
+
+    const calendar =
+    document.getElementById("calendarContainer");
+
+    const title =
+    document.getElementById("calendarTitle");
+
+    title.textContent =
+    `${currentYear}년 ${currentMonth+1}월`;
+
+    const firstDay =
+    new Date(currentYear,currentMonth,1);
+
+    const lastDay =
+    new Date(currentYear,currentMonth+1,0);
+
+    const startWeekday =
+    firstDay.getDay();
+
+    const totalDays =
+    lastDay.getDate();
+
+    let html = `
+
+    <div class="calendar-grid">
+
+        <div class="day-header">일</div>
+        <div class="day-header">월</div>
+        <div class="day-header">화</div>
+        <div class="day-header">수</div>
+        <div class="day-header">목</div>
+        <div class="day-header">금</div>
+        <div class="day-header">토</div>
+
+    `;
+
+    for(let i=0;i<startWeekday;i++){
+
+        html += `<div class="day"></div>`;
+
+    }
+
+    for(let day=1;day<=totalDays;day++){
+
+        html += `
+        <div class="day">
+            <div class="day-number">
+                ${day}
             </div>
         `;
 
-        card.querySelector(".summary")
-            .addEventListener("click",()=>{
-                card.classList.toggle("open");
-            });
+        competitions.forEach(item=>{
 
-        container.appendChild(card);
+            const start =
+            parseDate(item.start);
 
-    });
+            const end =
+            parseDate(item.end);
+
+            const current =
+            new Date(
+                currentYear,
+                currentMonth,
+                day
+            );
+
+            if(
+                current >= start &&
+                current <= end
+            ){
+
+                html += `
+                <div class="event">
+                    ${item.title}
+                </div>
+                `;
+
+            }
+
+        });
+
+        html += `
+        </div>
+        `;
+
+    }
+
+    html += `
+    </div>
+    `;
+
+    calendar.innerHTML = html;
 
 }
 
 document
-.getElementById("search")
-.addEventListener("input",e=>{
+.getElementById("prevMonth")
+.addEventListener("click",()=>{
 
-    const keyword =
-    e.target.value.toLowerCase();
+    currentMonth--;
 
-    const filtered =
-    allData.filter(item=>
+    if(currentMonth<0){
 
-        item.title.toLowerCase().includes(keyword) ||
+        currentMonth=11;
+        currentYear--;
 
-        item.place.toLowerCase().includes(keyword)
+    }
 
-    );
+    renderCalendar();
 
-    render(filtered);
+});
+
+document
+.getElementById("nextMonth")
+.addEventListener("click",()=>{
+
+    currentMonth++;
+
+    if(currentMonth>11){
+
+        currentMonth=0;
+        currentYear++;
+
+    }
+
+    renderCalendar();
 
 });
 
