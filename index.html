@@ -3,34 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>쇼트트랙 대회 일정</title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
+
 body{
-    font-family: Arial, sans-serif;
-    background:#f5f5f5;
     margin:0;
+    background:#f4f6f8;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
 header{
     background:#003366;
     color:white;
-    text-align:center;
     padding:20px;
+    text-align:center;
+}
+
+.search-box{
+    max-width:900px;
+    margin:20px auto;
+    padding:0 15px;
+}
+
+.search-box input{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
 }
 
 .container{
-    max-width:1000px;
+    max-width:900px;
     margin:auto;
-    padding:20px;
+    padding:0 15px 30px;
 }
 
 .card{
     background:white;
-    margin-bottom:15px;
-    border-radius:10px;
+    border-radius:12px;
+    margin-bottom:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    overflow:hidden;
+}
+
+.summary{
     padding:15px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
+    cursor:pointer;
 }
 
 .date{
@@ -39,29 +63,28 @@ header{
 }
 
 .title{
-    font-size:20px;
-    font-weight:bold;
-    margin:10px 0;
+    font-size:18px;
+    font-weight:700;
+    margin:8px 0;
 }
 
 .place{
-    color:#0077cc;
-    margin-bottom:10px;
-}
-
-button{
-    background:#0077cc;
-    color:white;
-    border:none;
-    padding:10px 15px;
-    border-radius:8px;
-    cursor:pointer;
+    color:#0066cc;
 }
 
 .detail{
     display:none;
-    margin-top:15px;
-    line-height:1.8;
+    border-top:1px solid #eee;
+    padding:15px;
+    background:#fafafa;
+}
+
+.detail p{
+    margin:8px 0;
+}
+
+.open .detail{
+    display:block;
 }
 </style>
 </head>
@@ -72,91 +95,137 @@ button{
 <h1>쇼트트랙 대회 일정</h1>
 </header>
 
-<div class="container" id="scheduleContainer">
-로딩 중...
+<div class="search-box">
+<input
+id="search"
+type="text"
+placeholder="대회명, 장소 검색">
+</div>
+
+<div id="container" class="container">
+불러오는 중...
 </div>
 
 <script>
 
-function toggleDetail(button){
-    const detail = button.nextElementSibling;
+const CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTXTlj2pF8TCG8PquxO8k_D1ehwsmFRZAt4hLZgPEp-MwndhhcguvcDRlwoX3SBJUd3G-RER-2TMeIO/pub?output=csv";
 
-    if(detail.style.display==="block"){
-        detail.style.display="none";
-        button.innerText="자세히 보기";
-    }else{
-        detail.style.display="block";
-        button.innerText="닫기";
-    }
+let allData = [];
+
+function parseDate(str){
+
+    if(!str) return new Date(9999,0,1);
+
+    const clean = str.replace(/\./g,"-");
+
+    return new Date(clean);
 }
 
-async function loadCSV(){
-
-    const container=document.getElementById("scheduleContainer");
+async function loadData(){
 
     try{
 
-        const response=await fetch("소트 프로그램3.csv");
-        const csvText=await response.text();
+        const response = await fetch(CSV_URL);
 
-        const rows=csvText.trim().split("\n");
+        const text = await response.text();
+
+        const rows = text.trim().split("\n");
 
         rows.shift();
 
-        container.innerHTML="";
+        allData = rows.map(row=>{
 
-        rows.forEach(row=>{
+            const cols = row.split(",");
 
-            const cols=row.split(",");
+            return {
+                date: cols[0] || "",
+                title: cols[1] || "",
+                place: cols[2] || "",
+                type: cols[3] || "",
+                target: cols[4] || "",
+                category: cols[5] || "",
+                result: cols[6] || ""
+            };
 
-            const date=cols[0]||"";
-            const title=cols[1]||"";
-            const place=cols[2]||"";
-            const type=cols[3]||"";
-            const target=cols[4]||"";
-            const category=cols[5]||"";
-
-            container.innerHTML+=`
-            <div class="card">
-
-                <div class="date">${date}</div>
-
-                <div class="title">
-                    ${title}
-                </div>
-
-                <div class="place">
-                    ${place}
-                </div>
-
-                <button onclick="toggleDetail(this)">
-                    자세히 보기
-                </button>
-
-                <div class="detail">
-                    <p><b>구분:</b> ${type}</p>
-                    <p><b>참가대상:</b> ${target}</p>
-                    <p><b>분류:</b> ${category}</p>
-                </div>
-
-            </div>
-            `;
         });
 
-    }catch(error){
+        allData.sort((a,b)=>
+            parseDate(a.date)-parseDate(b.date)
+        );
 
-        container.innerHTML=`
-        <div class="card">
-            <h3>CSV 파일을 불러올 수 없습니다.</h3>
-            <p>파일명이 정확히 "소트 프로그램3.csv"인지 확인하세요.</p>
-        </div>
-        `;
+        render(allData);
 
-        console.error(error);
+    }catch(err){
+
+        document.getElementById("container").innerHTML =
+        "<h3>데이터를 불러오지 못했습니다.</h3>";
+
+        console.error(err);
     }
 }
 
-loadCSV();
+function render(data){
+
+    const container =
+    document.getElementById("container");
+
+    container.innerHTML = "";
+
+    data.forEach(item=>{
+
+        const card =
+        document.createElement("div");
+
+        card.className = "card";
+
+        card.innerHTML = `
+            <div class="summary">
+                <div class="date">${item.date}</div>
+                <div class="title">${item.title}</div>
+                <div class="place">${item.place}</div>
+            </div>
+
+            <div class="detail">
+                <p><b>구분</b> : ${item.type}</p>
+                <p><b>참가대상</b> : ${item.target}</p>
+                <p><b>분류</b> : ${item.category}</p>
+                <p><b>경기결과</b> : ${item.result || "등록 전"}</p>
+            </div>
+        `;
+
+        card.querySelector(".summary")
+            .addEventListener("click",()=>{
+                card.classList.toggle("open");
+            });
+
+        container.appendChild(card);
+
+    });
+
+}
+
+document
+.getElementById("search")
+.addEventListener("input",e=>{
+
+    const keyword =
+    e.target.value.toLowerCase();
+
+    const filtered =
+    allData.filter(item=>
+
+        item.title.toLowerCase().includes(keyword) ||
+
+        item.place.toLowerCase().includes(keyword)
+
+    );
+
+    render(filtered);
+
+});
+
+loadData();
 
 </script>
 
