@@ -1005,23 +1005,14 @@ player.team===team
 
 function renderMainMenu(){
 
-const businessTeams =
-getBusinessTeams();
-
-const universityTeams =
-getUniversityTeams();
-
 let businessHtml = "";
 let universityHtml = "";
 
 /* 실업팀 */
 
-businessTeams.forEach(team=>{
-
-const teamPlayers =
-players.filter(
-p=>p.team===team
-);
+Object.keys(
+players.business
+).forEach(team=>{
 
 businessHtml += `
 
@@ -1031,10 +1022,11 @@ businessHtml += `
 ${team}
 </summary>
 
-${teamPlayers.map(player=>`
+${players.business[team]
+.map(player=>`
 
 <div class="player-name">
-${player.name}
+${player}
 </div>
 
 `).join("")}
@@ -1047,12 +1039,9 @@ ${player.name}
 
 /* 대학부 */
 
-universityTeams.forEach(team=>{
-
-const teamPlayers =
-players.filter(
-p=>p.team===team
-);
+Object.keys(
+players.university
+).forEach(team=>{
 
 universityHtml += `
 
@@ -1062,10 +1051,11 @@ universityHtml += `
 ${team}
 </summary>
 
-${teamPlayers.map(player=>`
+${players.university[team]
+.map(player=>`
 
 <div class="player-name">
-${player.name}
+${player}
 </div>
 
 `).join("")}
@@ -1140,14 +1130,11 @@ onclick="selectMenu('past')">
 남자 국가대표
 </summary>
 
-${players
-.filter(
-p=>p.team==="26-27 남국대"
-)
+${players.maleNational
 .map(player=>`
 
 <div class="player-name">
-${player.name}
+${player}
 </div>
 
 `).join("")}
@@ -1160,14 +1147,11 @@ ${player.name}
 여자 국가대표
 </summary>
 
-${players
-.filter(
-p=>p.team==="26-27 여국대"
-)
+${players.femaleNational
 .map(player=>`
 
 <div class="player-name">
-${player.name}
+${player}
 </div>
 
 `).join("")}
@@ -1199,36 +1183,6 @@ ${universityHtml}
 </details>
 
 `;
-
-}
-  /* =========================
-   탭 전환
-========================= */
-
-function showTab(tab){
-
-[
-"scheduleTab",
-"monthTab",
-"domesticTab",
-"internationalTab",
-"calendarTab",
-"pastTab"
-].forEach(id=>{
-
-document
-.getElementById(id)
-.classList
-.add("hidden");
-
-});
-
-document
-.getElementById(
-tab + "Tab"
-)
-.classList
-.remove("hidden");
 
 }
 
@@ -1841,37 +1795,73 @@ const text =
 await response.text();
 
 const rows =
-text
-.trim()
-.split("\n");
-
-/* 헤더 제거 */
+text.trim().split("\n");
 
 rows.shift();
 
-players = [];
+players = {
+
+maleNational:[],
+femaleNational:[],
+
+business:{
+"강원도청":[],
+"고양시청":[],
+"서울시청":[],
+"성남시청":[],
+"스포츠토토":[],
+"전북도청":[],
+"화성시청":[]
+},
+
+university:{
+"경희대":[],
+"고려대":[],
+"국민대":[],
+"단국대":[],
+"서울디지털대":[],
+"용인대":[],
+"한국체대":[],
+"한양대":[]
+}
+
+};
 
 rows.forEach(row=>{
 
-const c =
-parseCSVLine(row);
+const c = parseCSVLine(row);
 
-/*
-A열 = 이름
-B열 = 소속
-*/
+if(c[0]) players.maleNational.push(c[0]);
+if(c[1]) players.femaleNational.push(c[1]);
 
-players.push({
+if(c[2]) players.business["강원도청"].push(c[2]);
+if(c[3]) players.business["고양시청"].push(c[3]);
+if(c[4]) players.business["서울시청"].push(c[4]);
+if(c[5]) players.business["성남시청"].push(c[5]);
+if(c[6]) players.business["스포츠토토"].push(c[6]);
+if(c[7]) players.business["전북도청"].push(c[7]);
+if(c[8]) players.business["화성시청"].push(c[8]);
 
-name:
-(c[0] || "").trim(),
-
-team:
-(c[1] || "").trim()
+if(c[9]) players.university["경희대"].push(c[9]);
+if(c[10]) players.university["고려대"].push(c[10]);
+if(c[11]) players.university["국민대"].push(c[11]);
+if(c[12]) players.university["단국대"].push(c[12]);
+if(c[13]) players.university["서울디지털대"].push(c[13]);
+if(c[14]) players.university["용인대"].push(c[14]);
+if(c[15]) players.university["한국체대"].push(c[15]);
+if(c[16]) players.university["한양대"].push(c[16]);
 
 });
 
-});
+renderMainMenu();
+
+}catch(error){
+
+console.error(error);
+
+}
+
+}
 
 /* 메뉴 생성 */
 
