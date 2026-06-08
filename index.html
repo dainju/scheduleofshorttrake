@@ -760,10 +760,443 @@ tab+"Tab"
 .remove("hidden");
 
 }
-  /* 목록 렌더링 */
+  /* 일정 렌더링 */
 
 function renderTabs(){
 
 const schedule =
-document.getElementById(
-"scheduleTab"
+document.getElementById("scheduleTab");
+
+const month =
+document.getElementById("monthTab");
+
+const domestic =
+document.getElementById("domesticTab");
+
+const international =
+document.getElementById("internationalTab");
+
+const past =
+document.getElementById("pastTab");
+
+const keyword =
+document
+.getElementById("search")
+.value
+.toLowerCase();
+
+const today =
+new Date();
+
+today.setHours(
+0,0,0,0
+);
+
+let allHtml = "";
+let monthHtml = "";
+let domesticHtml = "";
+let internationalHtml = "";
+let pastHtml = "";
+
+competitions.forEach(
+(item,index)=>{
+
+const title =
+(item.title||"")
+.toLowerCase();
+
+const place =
+(item.place||"")
+.toLowerCase();
+
+if(
+!title.includes(keyword)
+&&
+!place.includes(keyword)
+){
+return;
+}
+
+const start =
+parseDate(item.start);
+
+const end =
+parseDate(item.end);
+
+const card =
+createCard(
+item,
+index
+);
+
+if(
+end &&
+end < today
+){
+
+pastHtml += card;
+return;
+
+}
+
+/* 전체 일정 */
+
+allHtml += card;
+
+/* 국내 */
+
+if(
+item.type==="국내"
+){
+domesticHtml += card;
+}
+
+/* 국제 */
+
+if(
+item.type==="국제"
+){
+internationalHtml += card;
+}
+
+/* 이번달 */
+
+if(start){
+
+if(
+start.getMonth()
+===
+today.getMonth()
+&&
+start.getFullYear()
+===
+today.getFullYear()
+){
+
+monthHtml += card;
+
+}
+
+}
+
+});
+
+schedule.innerHTML =
+allHtml;
+
+month.innerHTML =
+monthHtml;
+
+domestic.innerHTML =
+domesticHtml;
+
+international.innerHTML =
+internationalHtml;
+
+past.innerHTML =
+pastHtml;
+
+}
+
+/* 검색 */
+
+document
+.getElementById("search")
+.addEventListener(
+"input",
+renderTabs
+);
+
+  /* 달력 */
+
+function renderCalendar(){
+
+const year =
+currentDate.getFullYear();
+
+const month =
+currentDate.getMonth();
+
+document
+.getElementById("calendarTitle")
+.textContent =
+`${year}년 ${month+1}월`;
+
+const firstDay =
+new Date(year,month,1);
+
+const lastDay =
+new Date(year,month+1,0);
+
+let html = `
+<div class="calendar-grid">
+`;
+
+["일","월","화","수","목","금","토"]
+.forEach(day=>{
+
+html += `
+<div class="day-header">
+${day}
+</div>
+`;
+
+});
+
+for(
+let i=0;
+i<firstDay.getDay();
+i++
+){
+
+html += `
+<div class="day"></div>
+`;
+
+}
+
+for(
+let day=1;
+day<=lastDay.getDate();
+day++
+){
+
+html += `
+<div class="day">
+
+<div class="day-number">
+${day}
+</div>
+`;
+
+competitions.forEach(
+(item,index)=>{
+
+const start =
+parseDate(item.start);
+
+const end =
+parseDate(item.end);
+
+if(
+!start ||
+!end
+){
+return;
+}
+
+const current =
+new Date(
+year,
+month,
+day
+);
+
+if(
+current >= start &&
+current <= end
+){
+
+html += `
+<div
+class="event"
+onclick="openModal(${index})">
+
+${item.title}
+
+</div>
+`;
+
+}
+
+});
+
+html += `
+</div>
+`;
+
+}
+
+html += `
+</div>
+`;
+
+document
+.getElementById("calendarContainer")
+.innerHTML = html;
+
+}
+
+/* CSV 파싱 */
+
+function parseCSVLine(line){
+
+const result=[];
+
+let current="";
+
+let insideQuotes=false;
+
+for(
+let i=0;
+i<line.length;
+i++
+){
+
+const char=line[i];
+
+if(char === '"'){
+
+insideQuotes=
+!insideQuotes;
+
+continue;
+
+}
+
+if(
+char === "," &&
+!insideQuotes
+){
+
+result.push(current);
+
+current="";
+
+continue;
+
+}
+
+current += char;
+
+}
+
+result.push(current);
+
+return result;
+
+}
+
+/* 데이터 로드 */
+
+async function loadData(){
+
+try{
+
+const response =
+await fetch(CSV_URL);
+
+const text =
+await response.text();
+
+const rows =
+text
+.trim()
+.split("\n");
+
+rows.shift();
+
+competitions = [];
+
+rows.forEach(row=>{
+
+const c =
+parseCSVLine(row);
+
+competitions.push({
+
+start: c[0] || "",
+end: c[1] || "",
+title: c[2] || "",
+place: c[3] || "",
+type: c[4] || "",
+target: c[5] || "",
+category: c[6] || "",
+note: c[7] || "",
+result: c[8] || ""
+
+});
+
+});
+
+/* 시작일 기준 정렬 */
+
+competitions.sort(
+(a,b)=>{
+
+const da =
+parseDate(a.start);
+
+const db =
+parseDate(b.start);
+
+if(!da || !db){
+return 0;
+}
+
+return da-db;
+
+}
+);
+
+renderTabs();
+renderCalendar();
+
+}catch(error){
+
+console.error(error);
+
+document
+.getElementById("scheduleTab")
+.innerHTML = `
+<h3>
+데이터를 불러오지 못했습니다.
+</h3>
+`;
+
+}
+
+}
+
+/* 달력 이동 */
+
+document
+.getElementById("prevMonth")
+.addEventListener(
+"click",
+()=>{
+
+currentDate.setMonth(
+currentDate.getMonth()-1
+);
+
+renderCalendar();
+
+}
+);
+
+document
+.getElementById("nextMonth")
+.addEventListener(
+"click",
+()=>{
+
+currentDate.setMonth(
+currentDate.getMonth()+1
+);
+
+renderCalendar();
+
+}
+);
+
+/* 기본 화면 */
+
+showTab("schedule");
+
+loadData();
+
+</script>
+
+</body>
+</html>
