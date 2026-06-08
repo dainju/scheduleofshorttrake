@@ -981,29 +981,172 @@ ${player.name}
 
 </div>
 
+function renderMainMenu(){
+
+const businessTeams =
+getBusinessTeams();
+
+const universityTeams =
+getUniversityTeams();
+
+let businessHtml = "";
+let universityHtml = "";
+
+businessTeams.forEach(team=>{
+
+businessHtml += `
+
+<details>
+
+<summary class="menu-item">
+${team}
+</summary>
+
+${players
+.filter(p=>p.team===team)
+.map(p=>`
+<div class="menu-item">
+${p.name}
+</div>
+`).join("")}
+
+</details>
+
 `;
 
 });
 
-if(
-teamPlayers.length===0
-){
+universityTeams.forEach(team=>{
 
-html += `
+universityHtml += `
 
+<details>
+
+<summary class="menu-item">
+${team}
+</summary>
+
+${players
+.filter(p=>p.team===team)
+.map(p=>`
 <div class="menu-item">
-
-선수 없음
-
+${p.name}
 </div>
+`).join("")}
+
+</details>
 
 `;
 
-}
+});
 
 document
 .getElementById("menuArea")
-.innerHTML = html;
+.innerHTML = `
+
+<div class="menu-title">
+메뉴
+</div>
+
+<div class="menu-item"
+onclick="selectMenu('schedule')">
+전체 일정
+</div>
+
+<div class="menu-item"
+onclick="selectMenu('month')">
+이번달 경기
+</div>
+
+<div class="menu-item"
+onclick="selectMenu('domestic')">
+국내 대회
+</div>
+
+<div class="menu-item"
+onclick="selectMenu('international')">
+국제 대회
+</div>
+
+<div class="menu-item"
+onclick="selectMenu('calendar')">
+달력
+</div>
+
+<div class="menu-item"
+onclick="selectMenu('past')">
+종료 대회
+</div>
+
+<details>
+
+<summary class="menu-item">
+선수
+</summary>
+
+<details>
+
+<summary class="menu-item">
+국가대표
+</summary>
+
+<details>
+
+<summary class="menu-item">
+남자 국가대표
+</summary>
+
+${players
+.filter(p=>p.team==="26-27 남국대")
+.map(p=>`
+<div class="menu-item">
+${p.name}
+</div>
+`).join("")}
+
+</details>
+
+<details>
+
+<summary class="menu-item">
+여자 국가대표
+</summary>
+
+${players
+.filter(p=>p.team==="26-27 여국대")
+.map(p=>`
+<div class="menu-item">
+${p.name}
+</div>
+`).join("")}
+
+</details>
+
+</details>
+
+<details>
+
+<summary class="menu-item">
+실업팀
+</summary>
+
+${businessHtml}
+
+</details>
+
+<details>
+
+<summary class="menu-item">
+대학부
+</summary>
+
+${universityHtml}
+
+</details>
+
+</details>
+
+`;
 
 }
   /* =========================
@@ -2003,7 +2146,13 @@ showTab(
 
 loadData();
 
-loadPlayers();
+async function loadPlayers(){
+
+...
+
+renderMainMenu();
+
+}
 
 /* =========================
    사이드바 외부 클릭
