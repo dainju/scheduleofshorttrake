@@ -836,320 +836,252 @@ closeModal();
 }
 );
    /* =========================
-   달력
+   카드 생성
 ========================= */
 
-.calendar-nav{
+function createCard(
+item,
+index
+){
 
-display:flex;
+return `
 
-justify-content:center;
+<div
+class="card"
+onclick="openModal(${index})">
 
-align-items:center;
+<div class="card-top">
 
-gap:15px;
+<div>
+${formatRange(
+item.start,
+item.end
+)}
+</div>
 
-margin-bottom:20px;
+<div class="dday">
+${getDday(item)}
+</div>
 
-}
+</div>
 
-.calendar-nav button{
+<div class="title">
+${item.title}
+</div>
 
-padding:8px 15px;
+<div class="place">
+${item.place || ""}
+</div>
 
-border:none;
+</div>
 
-border-radius:8px;
-
-background:#afc2c9;
-
-color:white;
-
-cursor:pointer;
-
-}
-
-.calendar-grid{
-
-display:grid;
-
-grid-template-columns:repeat(7,1fr);
-
-gap:2px;
-
-background:#ddd;
-
-}
-
-.day-header{
-
-background:#afc2c9;
-
-color:white;
-
-padding:10px;
-
-text-align:center;
-
-font-weight:bold;
-
-}
-
-.day{
-
-background:white;
-
-min-height:110px;
-
-padding:5px;
-
-}
-
-.day-number{
-
-font-weight:bold;
-
-margin-bottom:5px;
-
-}
-
-.event{
-
-background:#eef7fb;
-
-padding:4px;
-
-border-radius:5px;
-
-margin-top:4px;
-
-font-size:11px;
-
-cursor:pointer;
-
-overflow:hidden;
-
-white-space:nowrap;
-
-text-overflow:ellipsis;
+`;
 
 }
 
 /* =========================
-   모달
+   햄버거 메뉴
 ========================= */
 
-.modal{
+function toggleMenu(){
 
-display:none;
-
-position:fixed;
-
-top:0;
-left:0;
-
-width:100%;
-height:100%;
-
-background:rgba(0,0,0,.55);
-
-justify-content:center;
-
-align-items:center;
-
-z-index:2000;
-
-padding:20px;
-
-}
-
-.modal-content{
-
-background:white;
-
-width:100%;
-
-max-width:700px;
-
-padding:25px;
-
-border-radius:15px;
-
-max-height:85vh;
-
-overflow:auto;
-
-}
-
-.modal-title{
-
-font-size:24px;
-
-font-weight:bold;
-
-margin-bottom:20px;
-
-}
-
-.info-row{
-
-margin-bottom:14px;
-
-line-height:1.7;
-
-}
-
-.close-btn{
-
-float:right;
-
-border:none;
-
-background:#afc2c9;
-
-color:white;
-
-padding:8px 14px;
-
-border-radius:8px;
-
-cursor:pointer;
+document
+.getElementById(
+"sidebar"
+)
+.classList
+.toggle(
+"open"
+);
 
 }
 
 /* =========================
-   모바일
+   메뉴 생성
 ========================= */
 
-@media(max-width:768px){
+function renderMainMenu(){
 
-header{
-font-size:22px;
+let businessHtml = "";
+let universityHtml = "";
+
+/* 실업팀 */
+
+Object.keys(
+players.business
+).forEach(team=>{
+
+businessHtml += `
+
+<details>
+
+<summary>
+${team}
+</summary>
+
+${players.business[team]
+.map(player=>`
+
+<div class="player-name">
+${player}
+</div>
+
+`).join("")}
+
+</details>
+
+`;
+
+});
+
+/* 대학부 */
+
+Object.keys(
+players.university
+).forEach(team=>{
+
+universityHtml += `
+
+<details>
+
+<summary>
+${team}
+</summary>
+
+${players.university[team]
+.map(player=>`
+
+<div class="player-name">
+${player}
+</div>
+
+`).join("")}
+
+</details>
+
+`;
+
+});
+
+document
+.getElementById(
+"menuArea"
+)
+.innerHTML = `
+
+<div class="menu-title">
+메뉴
+</div>
+
+<div
+class="menu-item"
+onclick="selectMenu('schedule')">
+전체 일정
+</div>
+
+<div
+class="menu-item"
+onclick="selectMenu('month')">
+이번달 경기
+</div>
+
+<div
+class="menu-item"
+onclick="selectMenu('domestic')">
+국내 대회
+</div>
+
+<div
+class="menu-item"
+onclick="selectMenu('international')">
+국제 대회
+</div>
+
+<div
+class="menu-item"
+onclick="selectMenu('calendar')">
+달력
+</div>
+
+<div
+class="menu-item"
+onclick="selectMenu('past')">
+종료 대회
+</div>
+
+<details>
+
+<summary>
+선수
+</summary>
+
+<details>
+
+<summary>
+국가대표
+</summary>
+
+<details>
+
+<summary>
+남자 국가대표
+</summary>
+
+${players.maleNational
+.map(player=>`
+
+<div class="player-name">
+${player}
+</div>
+
+`).join("")}
+
+</details>
+
+<details>
+
+<summary>
+여자 국가대표
+</summary>
+
+${players.femaleNational
+.map(player=>`
+
+<div class="player-name">
+${player}
+</div>
+
+`).join("")}
+
+</details>
+
+</details>
+
+<details>
+
+<summary>
+실업팀
+</summary>
+
+${businessHtml}
+
+</details>
+
+<details>
+
+<summary>
+대학부
+</summary>
+
+${universityHtml}
+
+</details>
+
+</details>
+
+`;
+
 }
-
-.title{
-font-size:18px;
-}
-
-.day{
-min-height:80px;
-}
-
-.event{
-font-size:10px;
-}
-
-.sidebar{
-width:280px;
-}
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<button
-class="menu-btn"
-onclick="toggleMenu()">
-☰
-</button>
-
-<div
-id="sidebar"
-class="sidebar">
-
-<div id="menuArea">
-</div>
-
-</div>
-
-<header>
-
-쇼트트랙 대회 일정
-
-</header>
-
-<div class="container">
-
-<input
-type="text"
-id="search"
-class="search"
-placeholder="대회명 또는 장소 검색">
-
-<div id="scheduleTab"></div>
-
-<div
-id="monthTab"
-class="hidden">
-</div>
-
-<div
-id="domesticTab"
-class="hidden">
-</div>
-
-<div
-id="internationalTab"
-class="hidden">
-</div>
-
-<div
-id="calendarTab"
-class="hidden">
-
-<div class="calendar-nav">
-
-<button id="prevMonth">
-◀
-</button>
-
-<h2 id="calendarTitle">
-</h2>
-
-<button id="nextMonth">
-▶
-</button>
-
-</div>
-
-<div id="calendarContainer">
-</div>
-
-</div>
-
-<div
-id="pastTab"
-class="hidden">
-</div>
-
-</div>
-
-<div
-id="detailModal"
-class="modal">
-
-<div class="modal-content">
-
-<button
-class="close-btn"
-onclick="closeModal()">
-
-닫기
-
-</button>
-
-<div id="modalBody">
-</div>
-
-</div>
-
-</div>
-
-<script>
    /* =========================
    탭 전환
 ========================= */
