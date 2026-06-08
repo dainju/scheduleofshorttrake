@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>쇼트트랙 대회 일정</title>
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+쇼트트랙 대회 일정
+</title>
 
 <style>
 
@@ -23,14 +29,20 @@ color:#222;
 /* 헤더 */
 
 header{
+
 background:#afc2c9;
+
 color:white;
+
 padding:20px 20px 20px 70px;
+
 font-size:26px;
+
 font-weight:bold;
+
 }
 
-/* 햄버거 버튼 */
+/* 햄버거 */
 
 .menu-btn{
 
@@ -58,16 +70,16 @@ z-index:1001;
 
 }
 
-/* 사이드 메뉴 */
+/* 사이드바 */
 
 .sidebar{
 
 position:fixed;
 
 top:0;
-left:-260px;
+left:-280px;
 
-width:250px;
+width:270px;
 height:100%;
 
 background:white;
@@ -77,6 +89,8 @@ box-shadow:2px 0 15px rgba(0,0,0,.15);
 transition:.3s;
 
 padding-top:80px;
+
+overflow-y:auto;
 
 z-index:1000;
 
@@ -90,22 +104,36 @@ left:0;
 
 width:100%;
 
-padding:16px;
+padding:15px;
 
 border:none;
 
 background:none;
 
+cursor:pointer;
+
 text-align:left;
 
-font-size:16px;
-
-cursor:pointer;
+font-size:15px;
 
 }
 
 .sidebar button:hover{
-background:#f3f4f6;
+
+background:#eef4f6;
+
+}
+
+.menu-title{
+
+padding:15px;
+
+font-size:13px;
+
+font-weight:bold;
+
+color:#888;
+
 }
 
 /* 본문 */
@@ -120,7 +148,7 @@ padding:20px;
 
 }
 
-/* 검색창 */
+/* 검색 */
 
 .search{
 
@@ -161,10 +189,10 @@ transition:.2s;
 }
 
 .card:hover{
-transform:translateY(-2px);
-}
 
-/* 날짜 + DDAY */
+transform:translateY(-2px);
+
+}
 
 .card-top{
 
@@ -190,8 +218,6 @@ color:#d32f2f;
 
 }
 
-/* 대회명 */
-
 .title{
 
 font-size:20px;
@@ -203,6 +229,7 @@ margin-bottom:10px;
 display:-webkit-box;
 
 -webkit-line-clamp:2;
+
 -webkit-box-orient:vertical;
 
 overflow:hidden;
@@ -211,11 +238,71 @@ text-overflow:ellipsis;
 
 }
 
-/* 장소 */
-
 .place{
 
 color:#0066cc;
+
+}
+
+/* 선수 카드 */
+
+.player-card{
+
+background:white;
+
+padding:16px;
+
+border-radius:14px;
+
+margin-bottom:12px;
+
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.player-name{
+
+font-size:18px;
+
+font-weight:bold;
+
+margin-bottom:6px;
+
+}
+
+.player-team{
+
+color:#666;
+
+font-size:14px;
+
+}
+
+.player-search{
+
+width:100%;
+
+padding:14px;
+
+font-size:16px;
+
+border:none;
+
+border-radius:12px;
+
+margin-bottom:20px;
+
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.section-title{
+
+font-size:24px;
+
+font-weight:bold;
+
+margin-bottom:20px;
 
 }
 
@@ -250,6 +337,7 @@ color:white;
 cursor:pointer;
 
 }
+  /* 달력 */
 
 .calendar-grid{
 
@@ -311,13 +399,7 @@ cursor:pointer;
 
 }
 
-/* 숨김 */
-
-.hidden{
-display:none;
-}
-
-/* 상세정보 모달 */
+/* 상세정보 */
 
 .modal{
 
@@ -395,6 +477,10 @@ cursor:pointer;
 
 }
 
+.hidden{
+display:none;
+}
+
 /* 모바일 */
 
 @media(max-width:768px){
@@ -418,6 +504,7 @@ font-size:10px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -428,7 +515,9 @@ onclick="toggleMenu()">
 ☰
 </button>
 
-<div id="sidebar" class="sidebar">
+<div
+id="sidebar"
+class="sidebar">
 
 <button onclick="selectMenu('schedule')">
 전체 일정
@@ -454,6 +543,26 @@ onclick="toggleMenu()">
 종료 대회
 </button>
 
+<div class="menu-title">
+선수 소개
+</div>
+
+<button onclick="showPlayerGroup('male')">
+남국대
+</button>
+
+<button onclick="showPlayerGroup('female')">
+여국대
+</button>
+
+<button onclick="showPlayerGroup('team')">
+실업팀
+</button>
+
+<button onclick="showPlayerGroup('university')">
+대학부
+</button>
+
 </div>
 
 <header>
@@ -470,33 +579,69 @@ placeholder="대회명 또는 장소 검색">
 
 <div id="scheduleTab"></div>
 
-<div id="monthTab" class="hidden"></div>
+<div
+id="monthTab"
+class="hidden">
+</div>
 
-<div id="domesticTab" class="hidden"></div>
+<div
+id="domesticTab"
+class="hidden">
+</div>
 
-<div id="internationalTab" class="hidden"></div>
+<div
+id="internationalTab"
+class="hidden">
+</div>
 
-<div id="calendarTab" class="hidden">
+<div
+id="calendarTab"
+class="hidden">
 
 <div class="calendar-nav">
 
-<button id="prevMonth">◀</button>
+<button id="prevMonth">
+◀
+</button>
 
 <h2 id="calendarTitle"></h2>
 
-<button id="nextMonth">▶</button>
+<button id="nextMonth">
+▶
+</button>
 
 </div>
 
-<div id="calendarContainer"></div>
+<div id="calendarContainer">
+</div>
 
 </div>
 
-<div id="pastTab" class="hidden"></div>
+<div
+id="pastTab"
+class="hidden">
+</div>
+
+<div
+id="playerTab"
+class="hidden">
+
+<input
+type="text"
+id="playerSearch"
+class="player-search"
+placeholder="선수 검색">
+
+<div id="playerContent">
+</div>
 
 </div>
 
-<div id="detailModal" class="modal">
+</div>
+
+<div
+id="detailModal"
+class="modal">
 
 <div class="modal-content">
 
@@ -506,28 +651,41 @@ onclick="closeModal()">
 닫기
 </button>
 
-<div id="modalBody"></div>
-
+<div id="modalBody">
 </div>
 
 </div>
+
+</div>
+
 <script>
 
 const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTRV-lLroEFMXiMaricD-GkYcWOyt8cwT6Z6f49GlqbJVwXMQdJllhzPc_gg8io9x6B-z0o_tk3Xbdl/pub?output=csv";
 
-let competitions = [];
-let currentDate = new Date();
+const PLAYER_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTyGAUBesyUjGuuAHSsJB0pVgTzPsW_D6H0i1U8mdflyI4zFPzmlwWYrMuXBIjSblX0c-7mVoFX3AW7/pub?output=csv";
 
-/* 날짜 변환 */
+let competitions = [];
+
+let players = [];
+
+let currentDate =
+new Date();
+
+let currentPlayerGroup =
+"male";
+  /* 날짜 변환 */
 
 function parseDate(str){
 
 if(!str) return null;
 
-const p = str.trim().split(".");
+const p =
+str.trim().split(".");
 
-if(p.length !== 3) return null;
+if(p.length!==3)
+return null;
 
 return new Date(
 Number(p[0]),
@@ -537,11 +695,14 @@ Number(p[2])
 
 }
 
-/* 날짜 표시 */
+/* 날짜 범위 */
 
 function formatRange(start,end){
 
-if(!end || start===end){
+if(
+!end ||
+start===end
+){
 return start;
 }
 
@@ -556,9 +717,8 @@ function getDday(item){
 const start =
 parseDate(item.start);
 
-if(!start){
+if(!start)
 return "";
-}
 
 const today =
 new Date();
@@ -583,7 +743,7 @@ return "";
 
 }
 
-/* 상세정보 */
+/* 상세 팝업 */
 
 function openModal(index){
 
@@ -600,37 +760,40 @@ ${item.title}
 
 <div class="info-row">
 <b>기간</b><br>
-${formatRange(item.start,item.end)}
+${formatRange(
+item.start,
+item.end
+)}
 </div>
 
 <div class="info-row">
 <b>장소</b><br>
-${item.place || "-"}
+${item.place||"-"}
 </div>
 
 <div class="info-row">
 <b>구분</b><br>
-${item.type || "-"}
+${item.type||"-"}
 </div>
 
 <div class="info-row">
 <b>참가대상</b><br>
-${item.target || "-"}
+${item.target||"-"}
 </div>
 
 <div class="info-row">
 <b>분류</b><br>
-${item.category || "-"}
+${item.category||"-"}
 </div>
 
 <div class="info-row">
 <b>비고</b><br>
-${item.note || "-"}
+${item.note||"-"}
 </div>
 
 <div class="info-row">
 <b>경기결과</b><br>
-${item.result || "등록 전"}
+${item.result||"등록 전"}
 </div>
 
 `;
@@ -651,7 +814,7 @@ document
 
 }
 
-/* 모달 바깥 클릭 */
+/* 바깥 클릭 */
 
 window.addEventListener(
 "click",
@@ -684,24 +847,32 @@ onclick="openModal(${index})">
 <div class="card-top">
 
 <div>
+
 ${formatRange(
 item.start,
 item.end
 )}
+
 </div>
 
 <div class="dday">
+
 ${getDday(item)}
+
 </div>
 
 </div>
 
 <div class="title">
+
 ${item.title}
+
 </div>
 
 <div class="place">
+
 ${item.place}
+
 </div>
 
 </div>
@@ -710,7 +881,7 @@ ${item.place}
 
 }
 
-/* 햄버거 메뉴 */
+/* 햄버거 */
 
 function toggleMenu(){
 
@@ -742,7 +913,8 @@ function showTab(tab){
 "domesticTab",
 "internationalTab",
 "calendarTab",
-"pastTab"
+"pastTab",
+"playerTab"
 ].forEach(id=>{
 
 document
@@ -765,19 +937,29 @@ tab+"Tab"
 function renderTabs(){
 
 const schedule =
-document.getElementById("scheduleTab");
+document.getElementById(
+"scheduleTab"
+);
 
 const month =
-document.getElementById("monthTab");
+document.getElementById(
+"monthTab"
+);
 
 const domestic =
-document.getElementById("domesticTab");
+document.getElementById(
+"domesticTab"
+);
 
 const international =
-document.getElementById("internationalTab");
+document.getElementById(
+"internationalTab"
+);
 
 const past =
-document.getElementById("pastTab");
+document.getElementById(
+"pastTab"
+);
 
 const keyword =
 document
@@ -835,11 +1017,12 @@ end < today
 ){
 
 pastHtml += card;
+
 return;
 
 }
 
-/* 전체 일정 */
+/* 전체 */
 
 allHtml += card;
 
@@ -848,7 +1031,9 @@ allHtml += card;
 if(
 item.type==="국내"
 ){
+
 domesticHtml += card;
+
 }
 
 /* 국제 */
@@ -856,7 +1041,9 @@ domesticHtml += card;
 if(
 item.type==="국제"
 ){
+
 internationalHtml += card;
+
 }
 
 /* 이번달 */
@@ -864,13 +1051,17 @@ internationalHtml += card;
 if(start){
 
 if(
+
 start.getMonth()
 ===
 today.getMonth()
+
 &&
+
 start.getFullYear()
 ===
 today.getFullYear()
+
 ){
 
 monthHtml += card;
@@ -898,7 +1089,7 @@ pastHtml;
 
 }
 
-/* 검색 */
+/* 일정 검색 */
 
 document
 .getElementById("search")
@@ -906,8 +1097,437 @@ document
 "input",
 renderTabs
 );
+  /* =========================
+   선수 데이터
+========================= */
 
-  /* 달력 */
+function showPlayerGroup(group){
+
+currentPlayerGroup =
+group;
+
+showTab("player");
+
+renderPlayers();
+
+document
+.getElementById("sidebar")
+.classList
+.remove("open");
+
+}
+
+function renderPlayers(){
+
+const wrap =
+document.getElementById(
+"playerContent"
+);
+
+const keyword =
+(
+document
+.getElementById(
+"playerSearch"
+)
+?.value || ""
+)
+.toLowerCase();
+
+let html = "";
+
+if(
+currentPlayerGroup ===
+"male"
+){
+
+html += `
+<div class="section-title">
+남자 국가대표
+</div>
+`;
+
+players
+.filter(p=>p.group==="male")
+.forEach(player=>{
+
+if(
+keyword &&
+!player.name
+.toLowerCase()
+.includes(keyword)
+){
+return;
+}
+
+html += `
+
+<div class="player-card">
+
+<div class="player-name">
+${player.name}
+</div>
+
+<div class="player-team">
+${player.team}
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+else if(
+currentPlayerGroup ===
+"female"
+){
+
+html += `
+<div class="section-title">
+여자 국가대표
+</div>
+`;
+
+players
+.filter(p=>p.group==="female")
+.forEach(player=>{
+
+if(
+keyword &&
+!player.name
+.toLowerCase()
+.includes(keyword)
+){
+return;
+}
+
+html += `
+
+<div class="player-card">
+
+<div class="player-name">
+${player.name}
+</div>
+
+<div class="player-team">
+${player.team}
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+else if(
+currentPlayerGroup ===
+"team"
+){
+
+html += `
+<div class="section-title">
+실업팀
+</div>
+`;
+
+const teams =
+[
+"강원도청",
+"고양시청",
+"서울시청",
+"성남시청",
+"스포츠토토",
+"전북도청",
+"화성시청"
+];
+
+teams.forEach(team=>{
+
+html += `
+<h3 style="margin:20px 0 10px;">
+${team}
+</h3>
+`;
+
+players
+.filter(
+p=>p.team===team
+)
+.forEach(player=>{
+
+if(
+keyword &&
+!player.name
+.toLowerCase()
+.includes(keyword)
+){
+return;
+}
+
+html += `
+
+<div class="player-card">
+
+<div class="player-name">
+${player.name}
+</div>
+
+</div>
+
+`;
+
+});
+
+});
+
+}
+
+else if(
+currentPlayerGroup ===
+"university"
+){
+
+html += `
+<div class="section-title">
+대학부
+</div>
+`;
+
+const universities =
+[
+"경희대",
+"고려대",
+"국민대",
+"단국대",
+"서울시립대",
+"용인대",
+"한국체대",
+"한양대"
+];
+
+universities.forEach(univ=>{
+
+html += `
+<h3 style="margin:20px 0 10px;">
+${univ}
+</h3>
+`;
+
+players
+.filter(
+p=>p.team===univ
+)
+.forEach(player=>{
+
+if(
+keyword &&
+!player.name
+.toLowerCase()
+.includes(keyword)
+){
+return;
+}
+
+html += `
+
+<div class="player-card">
+
+<div class="player-name">
+${player.name}
+</div>
+
+</div>
+
+`;
+
+});
+
+});
+
+}
+
+wrap.innerHTML = html;
+
+}
+  /* =========================
+   선수 CSV 로드
+========================= */
+
+async function loadPlayers(){
+
+try{
+
+const response =
+await fetch(
+PLAYER_URL
+);
+
+const text =
+await response.text();
+
+const rows =
+text.trim().split("\n");
+
+players = [];
+
+rows.forEach((row,rowIndex)=>{
+
+if(rowIndex===0)
+return;
+
+const cols =
+parseCSVLine(row);
+
+/* A 남국대 */
+
+if(cols[0]){
+
+players.push({
+
+name: cols[0].trim(),
+
+team:
+cols[2] ||
+"국가대표",
+
+group:
+"male"
+
+});
+
+}
+
+/* B 여국대 */
+
+if(cols[1]){
+
+players.push({
+
+name: cols[1].trim(),
+
+team:
+cols[3] ||
+"국가대표",
+
+group:
+"female"
+
+});
+
+}
+
+/* C~I 실업팀 */
+
+const teamNames = [
+
+"강원도청",
+"고양시청",
+"서울시청",
+"성남시청",
+"스포츠토토",
+"전북도청",
+"화성시청"
+
+];
+
+for(
+let i=2;
+i<=8;
+i++
+){
+
+if(cols[i]){
+
+players.push({
+
+name:
+cols[i].trim(),
+
+team:
+teamNames[i-2],
+
+group:
+"team"
+
+});
+
+}
+
+}
+
+/* J~Q 대학부 */
+
+const universityNames = [
+
+"경희대",
+"고려대",
+"국민대",
+"단국대",
+"서울시립대",
+"용인대",
+"한국체대",
+"한양대"
+
+];
+
+for(
+let i=9;
+i<=16;
+i++
+){
+
+if(cols[i]){
+
+players.push({
+
+name:
+cols[i].trim(),
+
+team:
+universityNames[i-9],
+
+group:
+"university"
+
+});
+
+}
+
+}
+
+});
+
+renderPlayers();
+
+}catch(error){
+
+console.error(
+"선수 데이터 로드 실패",
+error
+);
+
+}
+
+}
+
+/* 선수 검색 */
+
+document
+.getElementById(
+"playerSearch"
+)
+.addEventListener(
+"input",
+renderPlayers
+);
+  /* =========================
+   달력
+========================= */
 
 function renderCalendar(){
 
@@ -918,22 +1538,39 @@ const month =
 currentDate.getMonth();
 
 document
-.getElementById("calendarTitle")
+.getElementById(
+"calendarTitle"
+)
 .textContent =
 `${year}년 ${month+1}월`;
 
 const firstDay =
-new Date(year,month,1);
+new Date(
+year,
+month,
+1
+);
 
 const lastDay =
-new Date(year,month+1,0);
+new Date(
+year,
+month+1,
+0
+);
 
 let html = `
 <div class="calendar-grid">
 `;
 
-["일","월","화","수","목","금","토"]
-.forEach(day=>{
+[
+"일",
+"월",
+"화",
+"수",
+"목",
+"금",
+"토"
+].forEach(day=>{
 
 html += `
 <div class="day-header">
@@ -998,6 +1635,7 @@ current <= end
 ){
 
 html += `
+
 <div
 class="event"
 onclick="openModal(${index})">
@@ -1005,6 +1643,7 @@ onclick="openModal(${index})">
 ${item.title}
 
 </div>
+
 `;
 
 }
@@ -1022,20 +1661,62 @@ html += `
 `;
 
 document
-.getElementById("calendarContainer")
-.innerHTML = html;
+.getElementById(
+"calendarContainer"
+)
+.innerHTML =
+html;
 
 }
 
-/* CSV 파싱 */
+/* 이전 달 */
+
+document
+.getElementById(
+"prevMonth"
+)
+.addEventListener(
+"click",
+()=>{
+
+currentDate.setMonth(
+currentDate.getMonth()-1
+);
+
+renderCalendar();
+
+}
+);
+
+/* 다음 달 */
+
+document
+.getElementById(
+"nextMonth"
+)
+.addEventListener(
+"click",
+()=>{
+
+currentDate.setMonth(
+currentDate.getMonth()+1
+);
+
+renderCalendar();
+
+}
+);
+/* =========================
+   CSV 파서
+========================= */
 
 function parseCSVLine(line){
 
-const result=[];
+const result = [];
 
-let current="";
+let current = "";
 
-let insideQuotes=false;
+let insideQuotes = false;
 
 for(
 let i=0;
@@ -1043,11 +1724,11 @@ i<line.length;
 i++
 ){
 
-const char=line[i];
+const char = line[i];
 
 if(char === '"'){
 
-insideQuotes=
+insideQuotes =
 !insideQuotes;
 
 continue;
@@ -1061,7 +1742,7 @@ char === "," &&
 
 result.push(current);
 
-current="";
+current = "";
 
 continue;
 
@@ -1077,14 +1758,18 @@ return result;
 
 }
 
-/* 데이터 로드 */
+/* =========================
+   대회 데이터 로드
+========================= */
 
 async function loadData(){
 
 try{
 
 const response =
-await fetch(CSV_URL);
+await fetch(
+CSV_URL
+);
 
 const text =
 await response.text();
@@ -1105,21 +1790,38 @@ parseCSVLine(row);
 
 competitions.push({
 
-start: c[0] || "",
-end: c[1] || "",
-title: c[2] || "",
-place: c[3] || "",
-type: c[4] || "",
-target: c[5] || "",
-category: c[6] || "",
-note: c[7] || "",
-result: c[8] || ""
+start:
+c[0] || "",
+
+end:
+c[1] || "",
+
+title:
+c[2] || "",
+
+place:
+c[3] || "",
+
+type:
+c[4] || "",
+
+target:
+c[5] || "",
+
+category:
+c[6] || "",
+
+note:
+c[7] || "",
+
+result:
+c[8] || ""
 
 });
 
 });
 
-/* 시작일 기준 정렬 */
+/* 날짜순 정렬 */
 
 competitions.sort(
 (a,b)=>{
@@ -1130,7 +1832,10 @@ parseDate(a.start);
 const db =
 parseDate(b.start);
 
-if(!da || !db){
+if(
+!da ||
+!db
+){
 return 0;
 }
 
@@ -1140,6 +1845,7 @@ return da-db;
 );
 
 renderTabs();
+
 renderCalendar();
 
 }catch(error){
@@ -1147,54 +1853,32 @@ renderCalendar();
 console.error(error);
 
 document
-.getElementById("scheduleTab")
+.getElementById(
+"scheduleTab"
+)
 .innerHTML = `
+
 <h3>
 데이터를 불러오지 못했습니다.
 </h3>
+
 `;
 
 }
 
 }
 
-/* 달력 이동 */
+/* =========================
+   초기 실행
+========================= */
 
-document
-.getElementById("prevMonth")
-.addEventListener(
-"click",
-()=>{
-
-currentDate.setMonth(
-currentDate.getMonth()-1
+showTab(
+"schedule"
 );
-
-renderCalendar();
-
-}
-);
-
-document
-.getElementById("nextMonth")
-.addEventListener(
-"click",
-()=>{
-
-currentDate.setMonth(
-currentDate.getMonth()+1
-);
-
-renderCalendar();
-
-}
-);
-
-/* 기본 화면 */
-
-showTab("schedule");
 
 loadData();
+
+loadPlayers();
 
 </script>
 
