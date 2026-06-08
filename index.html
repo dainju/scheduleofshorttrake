@@ -902,6 +902,13 @@ document
 
 function renderMainMenu(){
 
+   if(
+!players.business ||
+!players.university
+){
+return;
+}
+   
 let businessHtml = "";
 let universityHtml = "";
 
