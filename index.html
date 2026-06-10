@@ -4613,3 +4613,380 @@ END
 </body>
 
 </html>
+/* =========================
+대회 카드 생성
+========================= */
+function createCompetitionCard(item,index){
+
+return `
+
+<div
+class="card"
+onclick="openCompetitionDetail(${index})">
+
+<div class="card-top">
+
+<div>
+${formatRange(item.start,item.end)}
+</div>
+
+<div class="dday">
+${getDday(item)}
+</div>
+
+</div>
+
+<div class="title">
+${item.title}
+</div>
+
+<div class="place">
+${item.place || ""}
+</div>
+
+</div>
+
+`;
+
+}
+
+/* =========================
+화면 렌더링
+========================= */
+function renderCompetitionList(
+screenId,
+list
+){
+
+const container =
+document.getElementById(screenId);
+
+if(!container) return;
+
+if(list.length===0){
+
+container.innerHTML=`
+
+<div class="list-item">
+등록된 대회가 없습니다.
+</div>
+
+`;
+
+return;
+
+}
+
+container.innerHTML=
+list.map(item=>{
+
+const index=
+competitions.indexOf(item);
+
+return createCompetitionCard(
+item,
+index
+);
+
+}).join("");
+
+}
+
+/* =========================
+검색 필터
+========================= */
+function getFilteredCompetitions(){
+
+const keyword=
+document
+.getElementById("search")
+.value
+.trim()
+.toLowerCase();
+
+if(!keyword){
+
+return competitions;
+
+}
+
+return competitions.filter(item=>{
+
+return (
+
+(item.title||"")
+.toLowerCase()
+.includes(keyword)
+
+||
+
+(item.place||"")
+.toLowerCase()
+.includes(keyword)
+
+);
+
+});
+
+}
+
+/* =========================
+탭 렌더링
+========================= */
+function renderTabs(){
+
+const filtered=
+getFilteredCompetitions();
+
+const today=
+new Date();
+
+today.setHours(
+0,0,0,0
+);
+
+/* 전체 */
+
+renderCompetitionList(
+"scheduleScreen",
+filtered
+);
+
+/* 이번달 */
+
+const currentMonth=
+currentDate.getMonth();
+
+const currentYear=
+currentDate.getFullYear();
+
+const monthList=
+filtered.filter(item=>{
+
+const date=
+parseDate(item.start);
+
+if(!date) return false;
+
+return (
+
+date.getMonth()===currentMonth &&
+date.getFullYear()===currentYear
+
+);
+
+});
+
+renderCompetitionList(
+"monthScreen",
+monthList
+);
+
+/* 국내 */
+
+const domestic=
+filtered.filter(item=>{
+
+return (
+item.type==="국내" ||
+item.type==="국내대회" ||
+item.category==="국내"
+);
+
+});
+
+renderCompetitionList(
+"domesticScreen",
+domestic
+);
+
+/* 국제 */
+
+const international=
+filtered.filter(item=>{
+
+return (
+item.type==="국제" ||
+item.type==="국제대회" ||
+item.category==="국제"
+);
+
+});
+
+renderCompetitionList(
+"internationalScreen",
+international
+);
+
+/* 종료대회 */
+
+const past=
+filtered.filter(item=>{
+
+const endDate=
+parseDate(
+item.end || item.start
+);
+
+if(!endDate) return false;
+
+return endDate < today;
+
+});
+
+renderCompetitionList(
+"pastScreen",
+past
+);
+
+}
+   /* =========================
+달력 렌더링
+========================= */
+function renderCalendar(){
+
+const year =
+currentDate.getFullYear();
+
+const month =
+currentDate.getMonth();
+
+document
+.getElementById(
+"calendarTitle"
+)
+.textContent =
+`${year}년 ${month+1}월`;
+
+const firstDay =
+new Date(year,month,1);
+
+const lastDay =
+new Date(year,month+1,0);
+
+let html = `
+
+<div class="calendar-grid">
+
+<div class="day-header">일</div>
+<div class="day-header">월</div>
+<div class="day-header">화</div>
+<div class="day-header">수</div>
+<div class="day-header">목</div>
+<div class="day-header">금</div>
+<div class="day-header">토</div>
+
+`;
+
+for(
+let i=0;
+i<firstDay.getDay();
+i++
+){
+
+html += `
+<div class="day"></div>
+`;
+
+}
+
+for(
+let day=1;
+day<=lastDay.getDate();
+day++
+){
+
+const dateString =
+
+year + "." +
+String(month+1).padStart(2,"0") + "." +
+String(day).padStart(2,"0");
+
+let events =
+competitions.filter(item=>{
+
+const start =
+parseDate(item.start);
+
+if(!start) return false;
+
+return (
+
+start.getFullYear()===year &&
+start.getMonth()===month &&
+start.getDate()===day
+
+);
+
+});
+
+html += `
+
+<div class="day">
+
+<div class="day-number">
+
+${day}
+
+</div>
+
+`;
+
+events.forEach(item=>{
+
+const index =
+competitions.indexOf(item);
+
+html += `
+
+<div
+class="event"
+onclick="openCompetitionDetail(${index})">
+
+${item.title}
+
+</div>
+
+`;
+
+});
+
+html += `
+</div>
+`;
+
+}
+
+const remain =
+(
+firstDay.getDay() +
+lastDay.getDate()
+) % 7;
+
+if(remain !== 0){
+
+for(
+let i=remain;
+i<7;
+i++
+){
+
+html += `
+<div class="day"></div>
+`;
+
+}
+
+}
+
+html += `
+</div>
+`;
+
+document
+.getElementById(
+"calendarContainer"
+)
+.innerHTML = html;
+
+}
