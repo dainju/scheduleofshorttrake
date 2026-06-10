@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Schedule Of ShortTrack</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/results.js"></script>
+<script src="js/players.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/app.js" defer></script>
+</head>
+
+<body>
+
+<!-- 햄버거 버튼 -->
+<button id="menuBtn" class="menu-btn">
+☰
+</button>
+
+<!-- 사이드 메뉴 -->
+<nav id="sidebar" class="sidebar">
+
+<div class="sidebar-title">
+Schedule Of ShortTrack
+</div>
+
+<div class="menu-item" data-page="calendar">
+달력
+</div>
+
+<div class="menu-group">
+
+<div class="menu-item expandable">
+종료대회
+</div>
+
+<div id="seasonMenu" class="submenu">
+
+<div class="season-item" data-season="26/27">
+26/27 시즌
+</div>
+
+<div class="season-item" data-season="25/26">
+25/26 시즌
+</div>
+
+<div class="season-item" data-season="24/25">
+24/25 시즌
+</div>
+
+<div class="season-item" data-season="23/24">
+23/24 시즌
+</div>
+
+<div class="season-item" data-season="22/23">
+22/23 시즌
+</div>
+
+<div class="season-item" data-season="21/22">
+21/22 시즌
+</div>
+
+<div class="season-item" data-season="20/21">
+20/21 시즌
+</div>
+
+<div class="season-item" data-season="19/20">
+19/20 시즌
+</div>
+
+<div class="season-item" data-season="18/19">
+18/19 시즌
+</div>
+
+<div class="season-item" data-season="17/18">
+17/18 시즌
+</div>
+
+</div>
+
+</div>
+
+<div class="menu-item" data-page="domestic">
+국내대회
+</div>
+
+<div class="menu-item" data-page="international">
+국제대회
+</div>
+
+<div class="menu-item" data-page="month">
+이번달대회
+</div>
+
+<div class="menu-item" data-page="players">
+선수
+</div>
+
+</nav>
+
+<!-- 오버레이 -->
+<div id="overlay" class="overlay"></div>
+
+<!-- 헤더 -->
+<header class="header">
+
+<h1>
+Schedule Of ShortTrack
+</h1>
+
+</header>
+
+<!-- 검색 -->
+<section class="search-section">
+
+<input
+id="searchInput"
+type="text"
+placeholder="선수명 또는 대회명 검색"
+/>
+
+</section>
+
+<!-- 메인 -->
+<main id="mainContent">
+
+<div id="competitionList">
+
+<!-- 카드 출력 -->
+
+</div>
+
+</main>
+
+<!-- 상세 모달 -->
+<div id="detailModal" class="modal">
+
+<div class="modal-content">
+
+<button id="closeModal" class="close-btn">
+✕
+</button>
+
+<div id="detailContent">
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
