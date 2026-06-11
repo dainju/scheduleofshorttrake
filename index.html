@@ -780,13 +780,6 @@ ${item.category || "-"}
 
 ${item.note || "-"}
 
-</div>
-
-<div class="info-row">
-
-<b>경기결과</b><br>
-
-${item.result || "등록 전"}
 
 </div>
 
@@ -902,8 +895,21 @@ document
 
 function renderMainMenu(){
 
+   if(
+!players.business ||
+!players.university ||
+!players.highschool ||
+!players.middleschool ||
+!players.elementaryschool ||
+){
+return;
+}
+   
 let businessHtml = "";
 let universityHtml = "";
+let highscoolHtml = "";
+let middleschoolHtml = "";
+let elementaryschoolHtml = "";
 
 /* 실업팀 */
 
@@ -949,6 +955,93 @@ ${team}
 </summary>
 
 ${players.university[team]
+.map(player=>`
+
+<div class="player-name">
+${player}
+</div>
+
+`).join("")}
+
+</details>
+
+`;
+
+});
+
+/* 고등부 */
+
+Object.keys(
+players.highschool
+).forEach(team=>{
+
+highschoolHtml += `
+
+<details>
+
+<summary>
+${team}
+</summary>
+
+${players.highschool[team]
+.map(player=>`
+
+<div class="player-name">
+${player}
+</div>
+
+`).join("")}
+
+</details>
+
+`;
+
+});
+
+/* 중등부 */
+
+Object.keys(
+players.middleschool
+).forEach(team=>{
+
+middleschoolHtml += `
+
+<details>
+
+<summary>
+${team}
+</summary>
+
+${players.middleschool[team]
+.map(player=>`
+
+<div class="player-name">
+${player}
+</div>
+
+`).join("")}
+
+</details>
+
+`;
+
+});
+
+/* 초등부 */
+
+Object.keys(
+players.highschool
+).forEach(team=>{
+
+elementaryschoolHtml += `
+
+<details>
+
+<summary>
+${team}
+</summary>
+
+${players.elementaryschool[team]
 .map(player=>`
 
 <div class="player-name">
@@ -1074,6 +1167,36 @@ ${businessHtml}
 </summary>
 
 ${universityHtml}
+
+</details>
+
+</details>
+
+<summary>
+고등부
+</summary>
+
+${highschoolHtml}
+
+</details>
+
+</details>
+
+<summary>
+중등부
+</summary>
+
+${middleschoolHtml}
+
+</details>
+
+</details>
+
+<summary>
+초등부
+</summary>
+
+${elementaryschoolHtml}
 
 </details>
 
@@ -1742,10 +1865,27 @@ university:{
 "고려대":[],
 "국민대":[],
 "단국대":[],
+"동의대":[],
+"디지털서울문화예술대":[],
 "서울디지털대":[],
 "용인대":[],
 "한국체대":[],
 "한양대":[]
+},
+
+highschool:{
+"남자 고등부(08~10년생)":[],
+"여자 고등부(08~10년생)":[],
+},
+
+middleschool:{
+"남자 중등부(11~13년생)":[],
+"여자 중등부(11~13년생)":[],
+},
+
+elementaryschool:{
+"남자 초등부(14~19년생)":[],
+"여자 초등부(14~19년생)":[],
 }
 
 };
@@ -1816,20 +1956,58 @@ players.university["단국대"]
 .push(c[12].trim());
 
 if(c[13])
-players.university["서울디지털대"]
+players.university["동의대"]
 .push(c[13].trim());
 
 if(c[14])
-players.university["용인대"]
+players.university["디지털서울문화예술대"]
 .push(c[14].trim());
 
 if(c[15])
-players.university["한국체대"]
+players.university["서울디지털대"]
 .push(c[15].trim());
 
 if(c[16])
-players.university["한양대"]
+players.university["용인대"]
 .push(c[16].trim());
+
+if(c[17])
+players.university["한국체대"]
+.push(c[17].trim());
+
+if(c[18])
+players.university["한양대"]
+.push(c[18].trim());
+
+/* 고등부 */
+
+if(c[19])
+players.highscool["남자 고등부(08~10년생)"]
+.push(c[19].trim());
+
+if(c[20])
+players.highscool["여자 고등부(08~10년생)"]
+.push(c[20].trim());
+
+/* 중등부 */
+
+if(c[21])
+players.middleschool["남자 중등부(11~13년생)"]
+.push(c[21].trim());
+
+if(c[22])
+players.middleschool["여자 고등부(11~13년생)"]
+.push(c[22].trim());
+
+/* 초등부 */
+
+if(c[23])
+players.elementaryschool["남자 초등부(14~19년생)"]
+.push(c[23].trim());
+
+if(c[24])
+players.elementaryschool["여자 초등부(14~19년생)"]
+.push(c[24].trim());
 
 });
 
