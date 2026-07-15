@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Shortchedule</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<button id="menuBtn">
+☰
+</button>
+
+<div class="logo">
+Shortchedule
+</div>
+
+</header>
+
+<div id="overlay"></div>
+
+<nav id="sidebar">
+
+<div class="menu" data-screen="schedule">
+전체일정
+</div>
+
+<div class="menu" data-screen="month">
+이번달 경기
+</div>
+
+<div class="menu" data-screen="domestic">
+국내대회
+</div>
+
+<div class="menu" data-screen="international">
+국제대회
+</div>
+
+<div class="menu" data-screen="past">
+종료대회
+</div>
+
+<div class="menu" data-screen="calendar">
+달력
+</div>
+
+</nav>
+
+<main>
+
+<input
+id="searchInput"
+type="text"
+placeholder="대회명 또는 장소 검색">
+
+<section
+id="schedule"
+class="screen active">
+
+<h2>
+전체일정
+</h2>
+
+<div id="scheduleList"></div>
+
+</section>
+
+<section
+id="month"
+class="screen">
+
+<h2>
+이번달 경기
+</h2>
+
+<div id="monthList"></div>
+
+</section>
+
+<section
+id="domestic"
+class="screen">
+
+<h2>
+국내대회
+</h2>
+
+<div id="domesticList"></div>
+
+</section>
+
+<section
+id="international"
+class="screen">
+
+<h2>
+국제대회
+</h2>
+
+<div id="internationalList"></div>
+
+</section>
+
+<section
+id="past"
+class="screen">
+
+<h2>
+종료대회
+</h2>
+
+<div id="seasonList"></div>
+
+<div id="pastList"></div>
+
+</section>
+
+<section
+id="calendar"
+class="screen">
+
+<div class="calendarHeader">
+
+<button id="prevMonth">
+◀
+</button>
+
+<h2 id="calendarTitle"></h2>
+
+<button id="nextMonth">
+▶
+</button>
+
+</div>
+
+<div id="calendarGrid"></div>
+
+</section>
+
+</main>
+
+<div id="modal">
+
+<div id="modalContent">
+
+<button id="closeModal">
+
+닫기
+
+</button>
+
+<div id="modalBody"></div>
+
+</div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
